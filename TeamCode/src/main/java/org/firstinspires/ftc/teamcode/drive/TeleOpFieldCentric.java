@@ -98,7 +98,7 @@ public class TeleOpFieldCentric extends LinearOpMode {
 //                    rightWinch.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 //                    leftWinch.setPower(.05);
 //                    rightWinch.setPower(.05);
-                    if (gamepad2.x) {
+                    if (gamepad2.y) {
 //                        leftWinch.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 //                        rightWinch.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                         leftWinch.setTargetPosition(LIFT_HIGH);
@@ -110,7 +110,7 @@ public class TeleOpFieldCentric extends LinearOpMode {
                         liftGoal = LIFT_HIGH;
                         liftState = LiftState.LIFT_EXTEND;
                     }
-                    else if(gamepad2.b){
+                    else if(gamepad2.a){
 //                        leftWinch.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 //                        rightWinch.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                         leftWinch.setTargetPosition(LIFT_LOW2);
@@ -122,7 +122,7 @@ public class TeleOpFieldCentric extends LinearOpMode {
                         liftGoal = LIFT_LOW2;
                         liftState = LiftState.LIFT_EXTEND;
                     }
-                    else if(gamepad2.y){
+                    else if(gamepad2.b){
 //                        leftWinch.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 //                        rightWinch.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                         leftWinch.setTargetPosition(LIFT_MID);
@@ -144,7 +144,7 @@ public class TeleOpFieldCentric extends LinearOpMode {
                     }
                     break;
                 case LIFT_RETRACT:
-                    if(gamepad2.a){
+                    if(gamepad2.dpad_down){
                         leftWinch.setTargetPosition(LIFT_LOW);
                         rightWinch.setTargetPosition(LIFT_LOW);
                         leftWinch.setPower(-.75);
@@ -230,13 +230,24 @@ public class TeleOpFieldCentric extends LinearOpMode {
             ).rotated(-poseEstimate.getHeading() + subtractHeading);
             // Pass in the rotated input + right stick value for rotation
             // Rotation is not part of the rotated input thus must be passed in separately
-            drive.setWeightedDrivePower(
-                    new Pose2d(
-                            input.getX(),
-                            input.getY(),
-                            -gamepad1.right_stick_x
-                    )
-            );
+            if(gamepad1.left_bumper){
+                drive.setWeightedDrivePower(
+                        new Pose2d(
+                                input.getX()/2,
+                                input.getY()/2,
+                                -gamepad1.right_stick_x
+                        )
+                );
+            }
+            else {
+                drive.setWeightedDrivePower(
+                        new Pose2d(
+                                input.getX(),
+                                input.getY(),
+                                -gamepad1.right_stick_x
+                        )
+                );
+            }
             telemetry.addData("state", liftState);
             telemetry.addData("winchCount", leftWinch.getCurrentPosition());
             telemetry.addData("armCount", chainBar.getCurrentPosition());
