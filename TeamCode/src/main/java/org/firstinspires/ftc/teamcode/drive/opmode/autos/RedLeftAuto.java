@@ -46,10 +46,41 @@ public class RedLeftAuto extends LinearOpMode{
     int MIDDLE = 1;
     int RIGHT = 2;
     AprilTagDetection tagOfInterest = null;
-
+    DcMotor leftWinch;
+    DcMotor rightWinch;
+    DcMotor turret;
+    DcMotor chainBar;
+    Servo leftIntake;
+    Servo rightIntake;
+    final int LIFT_LOW = 0;
+    final int LIFT_MID = 3500;
     @Override
     public void runOpMode()
     {
+        leftWinch = hardwareMap.dcMotor.get("leftWinch");
+        rightWinch = hardwareMap.dcMotor.get("rightWinch");
+        turret = hardwareMap.dcMotor.get("turret");
+        chainBar = hardwareMap.dcMotor.get("chainBar");
+        leftIntake = hardwareMap.servo.get("leftIntake");
+        rightIntake = hardwareMap.servo.get("rightIntake");
+        leftIntake.setPosition(.75);
+        rightIntake.setPosition(0.05);
+
+        leftWinch.setDirection(DcMotor.Direction.REVERSE);
+        chainBar.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftWinch.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightWinch.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftWinch.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightWinch.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        chainBar.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightWinch.setTargetPosition(LIFT_LOW);
+        leftWinch.setTargetPosition(LIFT_LOW);
+//        chainBar.setTargetPosition(ARM_LOW);
+        rightWinch.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        leftWinch.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//        chainBar.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        chainBar.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
@@ -57,6 +88,7 @@ public class RedLeftAuto extends LinearOpMode{
 
         camera.setPipeline(aprilTagDetectionPipeline);
         camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener()
+
         {
             @Override
             public void onOpened()
@@ -128,6 +160,7 @@ public class RedLeftAuto extends LinearOpMode{
                 .lineTo(new Vector2d(26, parkY)).build();
         drive.followTrajectory(traj1);
         drive.followTrajectory(traj2);
+
         drive.followTrajectory(traj3);
 
         /* You wouldn't have this in your autonomous, this is just to prevent the sample from ending */

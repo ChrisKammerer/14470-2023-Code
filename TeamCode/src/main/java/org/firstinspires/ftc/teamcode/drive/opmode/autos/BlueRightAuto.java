@@ -113,19 +113,19 @@ public class BlueRightAuto extends LinearOpMode{
 
         /* Actually do something useful */
         Trajectory traj1 = drive.trajectoryBuilder(startPose)
-                .lineTo(new Vector2d(26, 0)).build();
+                .lineTo(new Vector2d(27.5, 0)).build();
         Trajectory traj2 = drive.trajectoryBuilder(traj1.end())
-                .lineTo(new Vector2d(26, -10)).build();
+                .lineTo(new Vector2d(27.5, 10)).build();
         double parkY = 0;
         if(tagOfInterest==null || tagOfInterest.id == LEFT){
-            parkY = -21;
+            parkY = 25;
         }else if(tagOfInterest.id==MIDDLE){
             parkY = 0;
         }else if(tagOfInterest.id == RIGHT){
             parkY = -25;
         }
         Trajectory traj3 = drive.trajectoryBuilder(traj2.end())
-                .lineTo(new Vector2d(26, parkY)).build();
+                .lineTo(new Vector2d(27.5, parkY)).build();
         drive.followTrajectory(traj1);
         drive.followTrajectory(traj2);
         drive.followTrajectory(traj3);
