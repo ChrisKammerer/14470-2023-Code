@@ -138,7 +138,7 @@ public class TeleOpFieldCentric extends LinearOpMode {
                     break;
                 case LIFT_EXTEND:
                     if (Math.abs(leftWinch.getCurrentPosition()-liftGoal)<5
-                            || Math.abs(rightWinch.getCurrentPosition()-liftGoal)<5){
+                            || Math.abs(rightWinch.getCurrentPosition()-liftGoal)<5) {
                         liftGoal = LIFT_LOW;
                         liftState = LiftState.LIFT_RETRACT;
                     }
@@ -152,6 +152,13 @@ public class TeleOpFieldCentric extends LinearOpMode {
                     }
                     if(Math.abs(leftWinch.getCurrentPosition()-liftGoal)<5 || Math.abs(rightWinch.getCurrentPosition()-liftGoal)<5)
                         liftState = LiftState.LIFT_START;
+                    if(gamepad2.left_trigger>.1){
+                        leftWinch.setTargetPosition(leftWinch.getCurrentPosition()-25);
+                        rightWinch.setTargetPosition(leftWinch.getCurrentPosition()-25);
+                    } else if(gamepad2.right_trigger>.1){
+                        leftWinch.setTargetPosition(leftWinch.getCurrentPosition()+25);
+                        rightWinch.setTargetPosition(leftWinch.getCurrentPosition()+25);
+                    }
                     break;
                 default:
                     liftState = LiftState.LIFT_START;
