@@ -222,7 +222,9 @@ public class TeleOpFieldCentric extends LinearOpMode {
 //                }
 //            }
             chainBar.setPower(gamepad1.right_trigger);
-//            chainBar.setPower(-gamepad1.left_trigger);
+            if(gamepad1.left_trigger!=0) {
+                chainBar.setPower(-gamepad1.left_trigger);
+            }
             //reset FOD
             if (gamepad1.right_stick_button)
                 subtractHeading = drive.getPoseEstimate().getHeading();
