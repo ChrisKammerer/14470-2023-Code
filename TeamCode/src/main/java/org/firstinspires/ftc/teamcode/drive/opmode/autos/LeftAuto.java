@@ -67,7 +67,7 @@ public class LeftAuto extends LinearOpMode {
         TRAJECTORY_2, // move to mid pole and raise lift
         WAIT_1, // drop cone and lift
         TRAJECTORY_3, // park
-        IDLE
+        IDLE //end
     }
     State currentState = State.IDLE;
 
@@ -116,6 +116,8 @@ public class LeftAuto extends LinearOpMode {
          * The INIT-loop:
          * This REPLACES waitForStart!
          */
+
+        //CREATE TRAJECTORIES HERE
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
         Pose2d startPose = new Pose2d(0, 0, 0);
@@ -141,7 +143,16 @@ public class LeftAuto extends LinearOpMode {
             telemetry.update();
             sleep(20);
         }
+        //CREATE TRAJECTORIES
+        currentState = State.TRAJECTORY_1;
+        //follow trajectory_1
 
+        switch(currentState){
+            case TRAJECTORY_1:
+                if(!drive.isBusy()){
+                    currentState = State.TRAJECTORY_2;
+                }
+        }
 
 
     }
