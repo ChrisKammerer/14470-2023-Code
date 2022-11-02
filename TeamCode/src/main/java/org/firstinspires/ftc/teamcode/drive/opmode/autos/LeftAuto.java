@@ -23,7 +23,7 @@ import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import java.util.ArrayList;
 
 @Autonomous
-public class RedLeftAuto extends LinearOpMode {
+public class LeftAuto extends LinearOpMode {
     OpenCvCamera camera;
     AprilTagDetectionPipeline aprilTagDetectionPipeline;
 
@@ -62,6 +62,15 @@ public class RedLeftAuto extends LinearOpMode {
     final int ARM_BACK = -200;
     private ElapsedTime runtime = new ElapsedTime();
 
+    enum State{
+        TRAJECTORY_1, // move forward
+        TRAJECTORY_2, // move to mid pole and raise lift
+        WAIT_1, // drop cone and lift
+        TRAJECTORY_3, // park
+        IDLE
+    }
+    State currentState = State.IDLE;
+
     @Override
     public void runOpMode() {
         leftWinch = hardwareMap.dcMotor.get("leftWinch");
@@ -70,8 +79,6 @@ public class RedLeftAuto extends LinearOpMode {
         chainBar = hardwareMap.dcMotor.get("chainBar");
         leftIntake = hardwareMap.servo.get("leftIntake");
         rightIntake = hardwareMap.servo.get("rightIntake");
-
-
         leftWinch.setDirection(DcMotor.Direction.REVERSE);
         chainBar.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         leftWinch.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -85,8 +92,6 @@ public class RedLeftAuto extends LinearOpMode {
         rightWinch.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         leftWinch.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         chainBar.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-        chainBar.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
@@ -138,44 +143,7 @@ public class RedLeftAuto extends LinearOpMode {
         }
 
 
-        /* Actually do something useful */
-        leftIntake.setPosition(.45);
-        rightIntake.setPosition(.35);
-        Trajectory traj1 = drive.trajectoryBuilder(startPose)
-                .lineTo(new Vector2d(26, 0)).build();
-        Trajectory traj2 = drive.trajectoryBuilder(traj1.end())
-                .lineTo(new Vector2d(26, -10)).build();
-        double parkY = 0;
-        if (tagOfInterest == null || tagOfInterest.id == LEFT) {
-            parkY = 25;
-        } else if (tagOfInterest.id == MIDDLE) {
-            parkY = 0;
-        } else if (tagOfInterest.id == RIGHT) {
-            parkY = -21;
-        }
-        Trajectory traj3 = drive.trajectoryBuilder(traj2.end())
-                .lineTo(new Vector2d(26, parkY)).build();
-        drive.followTrajectory(traj1);
-        leftWinch.setTargetPosition(LIFT_MID);
-        rightWinch.setTargetPosition(LIFT_MID);
-        chainBar.setTargetPosition(ARM_MID);
-        leftWinch.setPower(.75);
-        rightWinch.setPower(.75);
-        chainBar.setPower(.75);
 
-        drive.followTrajectory(traj2);
-        runtime.reset();
-        while (runtime.seconds() < 5) {}
-
-            leftIntake.setPosition(.75);
-            rightIntake.setPosition(0.05);
-            leftWinch.setTargetPosition(LIFT_LOW);
-            rightWinch.setTargetPosition(LIFT_LOW);
-            chainBar.setTargetPosition(ARM_LOW);
-            drive.followTrajectory(traj3);
-
-            /* You wouldn't have this in your autonomous, this is just to prevent the sample from ending */
-
-        }
     }
+}
 
