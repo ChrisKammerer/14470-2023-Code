@@ -143,18 +143,71 @@ public class LeftAuto extends LinearOpMode {
             telemetry.update();
             sleep(20);
         }
-        //CREATE TRAJECTORIES
-        currentState = State.TRAJECTORY_1;
-        //follow trajectory_1
 
-        switch(currentState){
-            case TRAJECTORY_1:
-                if(!drive.isBusy()){
-                    currentState = State.TRAJECTORY_2;
-                }
+        // Trajectory 1: move forward
+        Trajectory trajectory1 = drive.trajectoryBuilder(startPose)
+                .lineTo(new Vector2d(26, 0))
+                .build();
+
+        // Trajectory 2: move to the base of the mid height pole
+        Trajectory trajectory2 = drive.trajectoryBuilder(trajectory1.end())
+                .splineTo(new Vector2d(28, -10), Math.toRadians(0))
+                .build();
+
+        // Trajectory 3: move to the correct parking space
+        double parkX = 0;
+        double parkY = 0;
+
+        if (tagOfInterest == null || tagOfInterest.id == LEFT) {
+            parkX = 21;
+            parkY = 24;
+        } else if (tagOfInterest.id == MIDDLE) {
+            parkX = 25;
+            parkY = 0;
+        } else if (tagOfInterest.id == RIGHT) {
+            parkX = 30;
+            parkY = -22;
         }
+        Trajectory trajectory3 = drive.trajectoryBuilder(trajectory2.end())
+                .lineTo(new Vector2d(parkX, parkY))
+                .build();
 
+        waitForStart();
+        if (isStopRequested()) return;
 
+        currentState = State.TRAJECTORY_1;
+        drive.followTrajectoryAsync(trajectory1);
+
+        while (opModeIsActive() && !isStopRequested()) {
+
+            switch (currentState) {
+                case TRAJECTORY_1:
+                    if (!drive.isBusy()) {
+                        currentState = State.TRAJECTORY_2;
+                        drive.followTrajectoryAsync(trajectory2);
+                    }
+                    break;
+
+                case TRAJECTORY_2:
+                    if (!drive.isBusy()) {
+                        currentState = State.TRAJECTORY_3;
+                        drive.followTrajectoryAsync(trajectory3);
+                    }
+                    break;
+
+                case TRAJECTORY_3:
+                    if (!drive.isBusy()) {
+                        currentState = State.IDLE;
+                    }
+                    break;
+
+                case IDLE:
+
+                    break;
+            }
+
+            drive.update();
+        }
     }
 }
 
