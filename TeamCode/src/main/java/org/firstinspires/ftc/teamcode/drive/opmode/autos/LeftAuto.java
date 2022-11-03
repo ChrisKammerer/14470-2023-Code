@@ -55,7 +55,7 @@ public class LeftAuto extends LinearOpMode {
     final int LIFT_LOW = 0;
     final int LIFT_LOW2 = 1200;
     final int LIFT_MID = 2800;
-    final int LIFT_HIGH = 4400;
+    final int LIFT_HIGH = 4650;
     final int ARM_LOW = 0;
     final int ARM_MID = 40;
     final int ARM_HIGH = 1070;
@@ -168,7 +168,7 @@ public class LeftAuto extends LinearOpMode {
 
         // Trajectory 2: move to the base of the mid height pole
         Trajectory trajectory2 = drive.trajectoryBuilder(trajectory1.end())
-                .lineTo(new Vector2d(29, -11))
+                .lineTo(new Vector2d(29, -11.2))
                 .build();
         // Trajectory 3: return to center lane
         Trajectory trajectory3 = drive.trajectoryBuilder(trajectory2.end())
@@ -180,7 +180,7 @@ public class LeftAuto extends LinearOpMode {
                 .build();
         // Trajectory 5: drive left and position to grab cone
         Trajectory trajectory5 = drive.trajectoryBuilder(trajectory4.end().plus(new Pose2d(0,0,Math.toRadians(100))))
-                .lineTo(new Vector2d(47.75, 27.5))
+                .lineTo(new Vector2d(47.75, 27.9))
                 .build();
         // Trajectory 6: drive backwards
         Trajectory trajectory6 = drive.trajectoryBuilder(trajectory5.end())
@@ -188,7 +188,7 @@ public class LeftAuto extends LinearOpMode {
                 .build();
         //Trajectory 7: move to cone placement
         Trajectory trajectory7 = drive.trajectoryBuilder(trajectory6.end().plus(new Pose2d(0,0,Math.toRadians(0))))
-                .lineTo(new Vector2d(48, -11))
+                .lineTo(new Vector2d(50, -6))
                 .build();
 
         double parkX = 0;
@@ -304,6 +304,7 @@ public class LeftAuto extends LinearOpMode {
                     break;
                 case TRAJECTORY_7:
                     if(!drive.isBusy()){
+                        rightIntake.setPosition(0.05);
                         currentState = State.IDLE;
                     }
                 case IDLE:
