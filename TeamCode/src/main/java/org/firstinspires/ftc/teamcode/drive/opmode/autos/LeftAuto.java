@@ -77,8 +77,9 @@ public class LeftAuto extends LinearOpMode {
         TURN_1, // turn to face cone stack
         TRAJECTORY_5, // drive to cone stack
         WAIT_2, // pick up cone1
-        TRAJECTORY_6, //drive to high pole and raise lift
-        TRAJECTORY_7, //park
+        TRAJECTORY_6, // drive away from stack a bit
+        TRAJECTORY_7, //drive to high pole and raise lift
+        TRAJECTORY_8, //park
 
         IDLE //end
     }
