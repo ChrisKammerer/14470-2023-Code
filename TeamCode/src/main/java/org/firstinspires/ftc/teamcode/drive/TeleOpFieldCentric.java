@@ -66,6 +66,8 @@ public class TeleOpFieldCentric extends LinearOpMode {
         chainBar.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         leftWinch.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightWinch.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        turret.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        turret.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         leftWinch.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightWinch.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 //        chainBar.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -260,6 +262,7 @@ public class TeleOpFieldCentric extends LinearOpMode {
             telemetry.addData("state", liftState);
             telemetry.addData("winchCount", leftWinch.getCurrentPosition());
             telemetry.addData("armCount", chainBar.getCurrentPosition());
+            telemetry.addData("turretCount", turret.getCurrentPosition());
             telemetry.update();
             // Update everything. Odometry. Etc.
             drive.update();
