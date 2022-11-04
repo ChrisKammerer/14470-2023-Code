@@ -23,7 +23,7 @@ import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import java.util.ArrayList;
 
 @Autonomous
-public class LeftAuto extends LinearOpMode {
+public class LeftAutoOneCone extends LinearOpMode {
     OpenCvCamera camera;
     AprilTagDetectionPipeline aprilTagDetectionPipeline;
 
@@ -72,15 +72,8 @@ public class LeftAuto extends LinearOpMode {
         TRAJECTORY_1, // move forward
         TRAJECTORY_2, // move to mid pole and raise lift
         WAIT_1, // drop cone and lift
-        TRAJECTORY_3, // strafe left
-        TRAJECTORY_4, // forward to cone stack
-        TURN_1, // turn to face cone stack
-        TRAJECTORY_5, // drive to cone stack
-        WAIT_2, // pick up cone1
-        TRAJECTORY_6, // drive away from stack a bit
-        TRAJECTORY_7, //drive to high pole and raise lift
-        TRAJECTORY_8, //park
-
+        TRAJECTORY_3, // park
+        TRAJECTORY_4,
         IDLE //end
     }
     State currentState = State.IDLE;
@@ -169,44 +162,27 @@ public class LeftAuto extends LinearOpMode {
 
         // Trajectory 2: move to the base of the mid height pole
         Trajectory trajectory2 = drive.trajectoryBuilder(trajectory1.end())
-                .lineTo(new Vector2d(30, -11.2))
+                .lineTo(new Vector2d(28, -11.2))
                 .build();
-        // Trajectory 3: return to center lane
         Trajectory trajectory3 = drive.trajectoryBuilder(trajectory2.end())
                 .lineTo(new Vector2d(28, 1))
-                .build();
-        // Trajectory 4: move forward to cone x value
-        Trajectory trajectory4 = drive.trajectoryBuilder(trajectory3.end())
-                .lineTo(new Vector2d(50.6, 2.6))
-                .build();
-        // Trajectory 5: drive left and position to grab cone
-        Trajectory trajectory5 = drive.trajectoryBuilder(trajectory4.end().plus(new Pose2d(0,0,Math.toRadians(100))))
-                .lineTo(new Vector2d(47.75, 27.9))
-                .build();
-        // Trajectory 6: drive backwards
-        Trajectory trajectory6 = drive.trajectoryBuilder(trajectory5.end())
-                .lineTo(new Vector2d(45, 7))
-                .build();
-        //Trajectory 7: move to cone placement
-        Trajectory trajectory7 = drive.trajectoryBuilder(trajectory6.end())
-                .lineTo(new Vector2d(49, -3))
                 .build();
 
         double parkX = 0;
         double parkY = 0;
 
         if (tagOfInterest == null || tagOfInterest.id == LEFT) {
-            parkX = 49;
-            parkY = 24;
+            parkX = 26;
+            parkY = 25;
         } else if (tagOfInterest.id == MIDDLE) {
-            parkX = 49;
+            parkX = 26;
             parkY = 0;
         } else if (tagOfInterest.id == RIGHT) {
-            parkX = 49;
-            parkY = -22;
+            parkX = 26;
+            parkY = -21;
         }
-        // Trajectory 8: move to the correct parking space
-        Trajectory trajectory8 = drive.trajectoryBuilder(trajectory7.end())
+        // Trajectory 3: move to the correct parking space
+        Trajectory trajectory4 = drive.trajectoryBuilder(trajectory3.end())
                 .lineTo(new Vector2d(parkX, parkY))
                 .build();
 
@@ -258,64 +234,9 @@ public class LeftAuto extends LinearOpMode {
                     if (!drive.isBusy()) {
                         currentState = State.TRAJECTORY_4;
                         drive.followTrajectoryAsync(trajectory4);
-                    }
+                        }
                     break;
                 case TRAJECTORY_4:
-                    if (!drive.isBusy()) {
-                        currentState = State.TURN_1;
-                        drive.turnAsync(Math.toRadians(100));
-                    }
-                    break;
-                case TURN_1:
-                    if(!drive.isBusy()){
-                        currentState = State.TRAJECTORY_5;
-                        chainBar.setTargetPosition(ARM_5CONE);
-                        drive.followTrajectoryAsync(trajectory5);
-                    }
-                    break;
-                case TRAJECTORY_5:
-                    if (!drive.isBusy()) {
-                        currentState = State.WAIT_2;
-                        runtime.reset();
-                    }
-                    break;
-                case WAIT_2:
-                    //close claw, wait, raise, wait, move
-                    leftIntake.setPosition(.45);
-                    rightIntake.setPosition(.35);
-                    if(runtime.seconds()>1.5 && runtime.seconds()<2.25){
-                        leftWinch.setTargetPosition(LIFT_LOW2);
-                        rightWinch.setTargetPosition(LIFT_LOW2);
-                        chainBar.setTargetPosition(ARM_HIGH);
-                        turret.setTargetPosition(TURRET_RIGHT);
-                        turret.setPower(.5);
-                    }
-                    if(runtime.seconds()>2.25){
-                        currentState = State.TRAJECTORY_6;
-                        drive.followTrajectoryAsync(trajectory6);
-                    }
-                    break;
-                case TRAJECTORY_6:
-                    if(!drive.isBusy()){
-                        leftWinch.setTargetPosition(LIFT_HIGH);
-                        rightWinch.setTargetPosition(LIFT_HIGH);
-                        drive.followTrajectory(trajectory7);
-                        currentState = State.TRAJECTORY_7;
-                        runtime.reset();
-                    }
-                    break;
-                case TRAJECTORY_7:
-                    if(!drive.isBusy() && runtime.seconds()>5){
-                        rightIntake.setPosition(0.05);
-                        leftIntake.setPosition(.75);
-                        currentState = State.TRAJECTORY_8;
-                        drive.followTrajectoryAsync(trajectory8);
-                    }
-                case TRAJECTORY_8:
-                    leftWinch.setTargetPosition(LIFT_LOW);
-                    rightWinch.setTargetPosition(LIFT_LOW);
-                    turret.setTargetPosition(TURRET_CENTER);
-                    chainBar.setTargetPosition(ARM_LOW);
                     if(!drive.isBusy()){
                         currentState = State.IDLE;
                     }
