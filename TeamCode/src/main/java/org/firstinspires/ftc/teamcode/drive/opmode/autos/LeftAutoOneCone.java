@@ -162,7 +162,7 @@ public class LeftAutoOneCone extends LinearOpMode {
 
         // Trajectory 2: move to the base of the mid height pole
         Trajectory trajectory2 = drive.trajectoryBuilder(trajectory1.end())
-                .lineTo(new Vector2d(27.6, -11.2))
+                .lineTo(new Vector2d(28.6, -11.0))
                 .build();
         Trajectory trajectory3 = drive.trajectoryBuilder(trajectory2.end())
                 .lineTo(new Vector2d(28, 1))

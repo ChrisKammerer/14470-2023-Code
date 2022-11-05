@@ -54,7 +54,7 @@ public class LeftAuto extends LinearOpMode {
     Servo rightIntake;
     final int LIFT_LOW = 0;
     final int LIFT_LOW2 = 1200;
-    final int LIFT_MID = 2800;
+    final int LIFT_MID = 3200;
     final int LIFT_HIGH = 4650;
     final int ARM_LOW = 0;
     final int ARM_MID = 1000;
@@ -169,7 +169,7 @@ public class LeftAuto extends LinearOpMode {
 
         // Trajectory 2: move to the base of the mid height pole
         Trajectory trajectory2 = drive.trajectoryBuilder(trajectory1.end())
-                .lineTo(new Vector2d(30, -11.2))
+                .lineTo(new Vector2d(28.6, -11.0))
                 .build();
         // Trajectory 3: return to center lane
         Trajectory trajectory3 = drive.trajectoryBuilder(trajectory2.end())
@@ -181,7 +181,7 @@ public class LeftAuto extends LinearOpMode {
                 .build();
         // Trajectory 5: drive left and position to grab cone
         Trajectory trajectory5 = drive.trajectoryBuilder(trajectory4.end().plus(new Pose2d(0,0,Math.toRadians(100))))
-                .lineTo(new Vector2d(47.75, 27.9))
+                .lineTo(new Vector2d(46.75, 26.9))
                 .build();
         // Trajectory 6: drive backwards
         Trajectory trajectory6 = drive.trajectoryBuilder(trajectory5.end())
@@ -312,13 +312,15 @@ public class LeftAuto extends LinearOpMode {
                         drive.followTrajectoryAsync(trajectory8);
                     }
                 case TRAJECTORY_8:
-                    leftWinch.setTargetPosition(LIFT_LOW);
-                    rightWinch.setTargetPosition(LIFT_LOW);
-                    turret.setTargetPosition(TURRET_CENTER);
-                    chainBar.setTargetPosition(ARM_LOW);
-                    if(!drive.isBusy()){
-                        currentState = State.IDLE;
+                    if(!drive.isBusy() && runtime.seconds()>6) {
+                        leftWinch.setTargetPosition(LIFT_LOW);
+                        rightWinch.setTargetPosition(LIFT_LOW);
+                        turret.setTargetPosition(TURRET_CENTER);
+                        chainBar.setTargetPosition(ARM_LOW);
                     }
+//                    if(!drive.isBusy()){
+//                        currentState = State.IDLE;
+//                    }
                 case IDLE:
                     break;
             }

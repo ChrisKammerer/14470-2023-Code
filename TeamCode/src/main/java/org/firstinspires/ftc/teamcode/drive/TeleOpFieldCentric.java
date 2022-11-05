@@ -44,7 +44,7 @@ public class TeleOpFieldCentric extends LinearOpMode {
     final int LIFT_LOW = 0;
     final int LIFT_LOW2 = 1200;
     final int LIFT_MID = 3100;
-    final int LIFT_HIGH = 4300;
+    final int LIFT_HIGH = 4600;
     final int ARM_LOW = 0;
     final int ARM_MID = 40;
     final int ARM_HIGH = 80;
