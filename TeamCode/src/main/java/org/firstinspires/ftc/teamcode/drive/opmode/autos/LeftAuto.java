@@ -169,7 +169,7 @@ public class LeftAuto extends LinearOpMode {
 
         // Trajectory 2: move to the base of the mid height pole
         Trajectory trajectory2 = drive.trajectoryBuilder(trajectory1.end())
-                .lineTo(new Vector2d(30, -11.2))
+                .lineTo(new Vector2d(27.6, -11.2))
                 .build();
         // Trajectory 3: return to center lane
         Trajectory trajectory3 = drive.trajectoryBuilder(trajectory2.end())
@@ -225,8 +225,8 @@ public class LeftAuto extends LinearOpMode {
                     if (!drive.isBusy()) {
                         currentState = State.TRAJECTORY_2;
                         drive.followTrajectoryAsync(trajectory2);
-                        leftWinch.setTargetPosition(LIFT_MID);
-                        rightWinch.setTargetPosition(LIFT_MID);
+                        leftWinch.setTargetPosition(LIFT_MID+400);
+                        rightWinch.setTargetPosition(LIFT_MID+400);
                         chainBar.setTargetPosition(ARM_MID);
                         leftWinch.setPower(.75);
                         rightWinch.setPower(.75);
@@ -297,8 +297,8 @@ public class LeftAuto extends LinearOpMode {
                     break;
                 case TRAJECTORY_6:
                     if(!drive.isBusy()){
-                        leftWinch.setTargetPosition(LIFT_HIGH);
-                        rightWinch.setTargetPosition(LIFT_HIGH);
+                        leftWinch.setTargetPosition(LIFT_HIGH+100);
+                        rightWinch.setTargetPosition(LIFT_HIGH+100);
                         drive.followTrajectory(trajectory7);
                         currentState = State.TRAJECTORY_7;
                         runtime.reset();
