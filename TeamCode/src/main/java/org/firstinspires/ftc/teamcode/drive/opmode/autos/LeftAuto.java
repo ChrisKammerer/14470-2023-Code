@@ -54,16 +54,16 @@ public class LeftAuto extends LinearOpMode {
     Servo rightIntake;
     final int LIFT_LOW = 0;
     final int LIFT_LOW2 = 1200;
-    final int LIFT_MID = 2800;
-    final int LIFT_HIGH = 4300;
+    final int LIFT_MID = 2950;
+    final int LIFT_HIGH = 4640;
     final int ARM_LOW = 0;
     final int ARM_MID = 1000;
-    final int ARM_HIGH = 1250;
+    final int ARM_HIGH = 1400;
     final int ARM_BACK = -200;
     final int TURRET_RIGHT = -1400;
     final int TURRET_CENTER = 0;
 
-    final int ARM_5CONE = 680;
+    final int ARM_5CONE = 630;
 
 
     private ElapsedTime runtime = new ElapsedTime();
@@ -170,7 +170,7 @@ public class LeftAuto extends LinearOpMode {
 
         // Trajectory 2: move to the base of the mid height pole
         Trajectory trajectory2 = drive.trajectoryBuilder(trajectory1.end())
-                .lineTo(new Vector2d(27, -11.2))
+                .lineTo(new Vector2d(27.6, -11.2))
                 .build();
         // Trajectory 3: return to center lane
         Trajectory trajectory3 = drive.trajectoryBuilder(trajectory2.end())
@@ -190,7 +190,7 @@ public class LeftAuto extends LinearOpMode {
                 .build();
         //Trajectory 7: move to cone placement
         Trajectory trajectory7 = drive.trajectoryBuilder(trajectory6.end())
-                .lineTo(new Vector2d(50, -11.2))
+                .lineTo(new Vector2d(53, -10))
                 .build();
 
         double parkX = 0;
@@ -311,23 +311,24 @@ public class LeftAuto extends LinearOpMode {
                         currentState = State.WAIT_3;
                         runtime.reset();
                     }
+                    break;
                 case WAIT_3:
-                    if(runtime.seconds()>3.5) {
+
+                    if(runtime.seconds()>2.5) {
                         rightIntake.setPosition(0.05);
                         leftIntake.setPosition(.75);
                     }
-
-                    if(runtime.seconds()>4){
+                    if(runtime.seconds()>2.6){
                         leftWinch.setTargetPosition(LIFT_LOW);
                         rightWinch.setTargetPosition(LIFT_LOW);
                         turret.setTargetPosition(TURRET_CENTER);
                         chainBar.setTargetPosition(ARM_LOW);
+
                         drive.followTrajectoryAsync(trajectory8);
                         currentState = State.TRAJECTORY_8;
                     }
-
+                    break;
                 case TRAJECTORY_8:
-
                     if(!drive.isBusy()){
                         currentState = State.IDLE;
                     }
@@ -336,6 +337,8 @@ public class LeftAuto extends LinearOpMode {
             }
 
             drive.update();
+            telemetry.addData("state", currentState);
+            telemetry.update();
         }
     }
 }
