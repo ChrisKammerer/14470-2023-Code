@@ -54,16 +54,16 @@ public class LeftAuto extends LinearOpMode {
     Servo rightIntake;
     final int LIFT_LOW = 0;
     final int LIFT_LOW2 = 1200;
-    final int LIFT_MID = 3200;
-    final int LIFT_HIGH = 4650;
+    final int LIFT_MID = 2950;
+    final int LIFT_HIGH = 4640;
     final int ARM_LOW = 0;
     final int ARM_MID = 1000;
-    final int ARM_HIGH = 1250;
+    final int ARM_HIGH = 1400;
     final int ARM_BACK = -200;
     final int TURRET_RIGHT = -1400;
     final int TURRET_CENTER = 0;
 
-    final int ARM_5CONE = 680;
+    final int ARM_5CONE = 630;
 
 
     private ElapsedTime runtime = new ElapsedTime();
@@ -79,6 +79,7 @@ public class LeftAuto extends LinearOpMode {
         WAIT_2, // pick up cone1
         TRAJECTORY_6, // drive away from stack a bit
         TRAJECTORY_7, //drive to high pole and raise lift
+        WAIT_3, //drop cones and lower lift
         TRAJECTORY_8, //park
 
         IDLE //end
@@ -169,7 +170,7 @@ public class LeftAuto extends LinearOpMode {
 
         // Trajectory 2: move to the base of the mid height pole
         Trajectory trajectory2 = drive.trajectoryBuilder(trajectory1.end())
-                .lineTo(new Vector2d(28.6, -11.0))
+                .lineTo(new Vector2d(27.6, -11.2))
                 .build();
         // Trajectory 3: return to center lane
         Trajectory trajectory3 = drive.trajectoryBuilder(trajectory2.end())
@@ -181,15 +182,15 @@ public class LeftAuto extends LinearOpMode {
                 .build();
         // Trajectory 5: drive left and position to grab cone
         Trajectory trajectory5 = drive.trajectoryBuilder(trajectory4.end().plus(new Pose2d(0,0,Math.toRadians(100))))
-                .lineTo(new Vector2d(46.75, 26.9))
+                .lineTo(new Vector2d(46.75, 26.5))
                 .build();
         // Trajectory 6: drive backwards
         Trajectory trajectory6 = drive.trajectoryBuilder(trajectory5.end())
-                .lineTo(new Vector2d(45, 7))
+                .lineTo(new Vector2d(49, 7))
                 .build();
         //Trajectory 7: move to cone placement
         Trajectory trajectory7 = drive.trajectoryBuilder(trajectory6.end())
-                .lineTo(new Vector2d(49, -3))
+                .lineTo(new Vector2d(53, -10))
                 .build();
 
         double parkX = 0;
@@ -225,8 +226,8 @@ public class LeftAuto extends LinearOpMode {
                     if (!drive.isBusy()) {
                         currentState = State.TRAJECTORY_2;
                         drive.followTrajectoryAsync(trajectory2);
-                        leftWinch.setTargetPosition(LIFT_MID);
-                        rightWinch.setTargetPosition(LIFT_MID);
+                        leftWinch.setTargetPosition(LIFT_MID+400);
+                        rightWinch.setTargetPosition(LIFT_MID+400);
                         chainBar.setTargetPosition(ARM_MID);
                         leftWinch.setPower(.75);
                         rightWinch.setPower(.75);
@@ -290,7 +291,7 @@ public class LeftAuto extends LinearOpMode {
                         turret.setTargetPosition(TURRET_RIGHT);
                         turret.setPower(.5);
                     }
-                    if(runtime.seconds()>2.25){
+                    if(runtime.seconds()>1.5){
                         currentState = State.TRAJECTORY_6;
                         drive.followTrajectoryAsync(trajectory6);
                     }
@@ -299,33 +300,45 @@ public class LeftAuto extends LinearOpMode {
                     if(!drive.isBusy()){
                         leftWinch.setTargetPosition(LIFT_HIGH);
                         rightWinch.setTargetPosition(LIFT_HIGH);
+                        leftWinch.setPower(.5);
+                        rightWinch.setPower(.5);
                         drive.followTrajectory(trajectory7);
                         currentState = State.TRAJECTORY_7;
-                        runtime.reset();
                     }
                     break;
                 case TRAJECTORY_7:
-                    if(!drive.isBusy() && runtime.seconds()>5){
+                    if(!drive.isBusy()){
+                        currentState = State.WAIT_3;
+                        runtime.reset();
+                    }
+                    break;
+                case WAIT_3:
+
+                    if(runtime.seconds()>2.5) {
                         rightIntake.setPosition(0.05);
                         leftIntake.setPosition(.75);
-                        currentState = State.TRAJECTORY_8;
-                        drive.followTrajectoryAsync(trajectory8);
                     }
-                case TRAJECTORY_8:
-                    if(!drive.isBusy() && runtime.seconds()>6) {
+                    if(runtime.seconds()>2.6){
                         leftWinch.setTargetPosition(LIFT_LOW);
                         rightWinch.setTargetPosition(LIFT_LOW);
                         turret.setTargetPosition(TURRET_CENTER);
                         chainBar.setTargetPosition(ARM_LOW);
+
+                        drive.followTrajectoryAsync(trajectory8);
+                        currentState = State.TRAJECTORY_8;
                     }
-//                    if(!drive.isBusy()){
-//                        currentState = State.IDLE;
-//                    }
+                    break;
+                case TRAJECTORY_8:
+                    if(!drive.isBusy()){
+                        currentState = State.IDLE;
+                    }
                 case IDLE:
                     break;
             }
 
             drive.update();
+            telemetry.addData("state", currentState);
+            telemetry.update();
         }
     }
 }
