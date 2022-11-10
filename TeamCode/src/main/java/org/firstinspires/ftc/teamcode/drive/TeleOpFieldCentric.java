@@ -107,8 +107,8 @@ public class TeleOpFieldCentric extends LinearOpMode {
                         rightWinch.setTargetPosition(LIFT_HIGH);
 //                        rightWinch.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 //                        leftWinch.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                        leftWinch.setPower(.75);
-                        rightWinch.setPower(.75);
+                        leftWinch.setPower(1);
+                        rightWinch.setPower(1);
                         liftGoal = LIFT_HIGH;
                         liftState = LiftState.LIFT_EXTEND;
                     }
@@ -119,8 +119,8 @@ public class TeleOpFieldCentric extends LinearOpMode {
                         rightWinch.setTargetPosition(LIFT_LOW2);
 //                        rightWinch.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 //                        leftWinch.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                        leftWinch.setPower(.75);
-                        rightWinch.setPower(.75);
+                        leftWinch.setPower(1);
+                        rightWinch.setPower(1);
                         liftGoal = LIFT_LOW2;
                         liftState = LiftState.LIFT_EXTEND;
                     }
@@ -131,8 +131,8 @@ public class TeleOpFieldCentric extends LinearOpMode {
                         rightWinch.setTargetPosition(LIFT_MID);
 //                        rightWinch.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 //                        leftWinch.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                        leftWinch.setPower(.75);
-                        rightWinch.setPower(.75);
+                        leftWinch.setPower(1);
+                        rightWinch.setPower(1);
                         liftGoal = LIFT_MID;
                         liftState = LiftState.LIFT_EXTEND;
                     }
@@ -149,8 +149,8 @@ public class TeleOpFieldCentric extends LinearOpMode {
                     if(gamepad2.dpad_down){
                         leftWinch.setTargetPosition(LIFT_LOW);
                         rightWinch.setTargetPosition(LIFT_LOW);
-                        leftWinch.setPower(-.75);
-                        rightWinch.setPower(.75);
+                        leftWinch.setPower(-1);
+                        rightWinch.setPower(1);
                     }
                     if(Math.abs(leftWinch.getCurrentPosition()-liftGoal)<5 || Math.abs(rightWinch.getCurrentPosition()-liftGoal)<5)
                         liftState = LiftState.LIFT_START;
@@ -189,9 +189,9 @@ public class TeleOpFieldCentric extends LinearOpMode {
 //            }
             // rotate turret
             if(gamepad2.dpad_left)
-                turret.setPower(.6);
+                turret.setPower(.8);
             else if(gamepad2.dpad_right)
-                turret.setPower(-.6);
+                turret.setPower(-.8);
             else turret.setPower(0);
 
             //intake
