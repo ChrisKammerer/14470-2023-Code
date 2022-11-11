@@ -23,7 +23,7 @@ import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import java.util.ArrayList;
 
 @Autonomous
-public class LeftAuto extends LinearOpMode {
+public class LeftAutoRNGFix extends LinearOpMode {
     OpenCvCamera camera;
     AprilTagDetectionPipeline aprilTagDetectionPipeline;
 
@@ -74,6 +74,7 @@ public class LeftAuto extends LinearOpMode {
         WAIT_1, // drop cone and lift
         TRAJECTORY_3, // strafe left
         TRAJECTORY_4, // forward to cone stack
+        TRAJECTORY_4_5,
         TURN_1, // turn to face cone stack
         TRAJECTORY_5, // drive to cone stack
         WAIT_2, // pick up cone1
@@ -176,12 +177,15 @@ public class LeftAuto extends LinearOpMode {
         Trajectory trajectory3 = drive.trajectoryBuilder(trajectory2.end())
                 .lineTo(new Vector2d(28, 1))
                 .build();
-        // Trajectory 4: move forward to cone x value
         Trajectory trajectory4 = drive.trajectoryBuilder(trajectory3.end())
+                .lineTo(new Vector2d(55, 2.6))
+                .build();
+        // Trajectory 4: move forward to cone x value
+        Trajectory trajectory4_5 = drive.trajectoryBuilder(trajectory4.end())
                 .lineTo(new Vector2d(50.6, 2.6))
                 .build();
         // Trajectory 5: drive left and position to grab cone
-        Trajectory trajectory5 = drive.trajectoryBuilder(trajectory4.end().plus(new Pose2d(0,0,Math.toRadians(90))))
+        Trajectory trajectory5 = drive.trajectoryBuilder(trajectory4_5.end().plus(new Pose2d(0,0,Math.toRadians(90))))
                 .lineTo(new Vector2d(47.5, 25.5))
                 .build();
         // Trajectory 6: drive backwards
@@ -197,11 +201,11 @@ public class LeftAuto extends LinearOpMode {
         double parkY = 0;
 
         if (tagOfInterest == null || tagOfInterest.id == LEFT) {
-            parkX = 50;
-            parkY = 24;
+            parkX = 47;
+            parkY = 25;
         } else if (tagOfInterest.id == MIDDLE) {
             parkX = 49;
-            parkY = 0;
+            parkY = 1;
         } else if (tagOfInterest.id == RIGHT) {
             parkX = 49;
             parkY = -22;
@@ -243,10 +247,12 @@ public class LeftAuto extends LinearOpMode {
                     break;
                 case WAIT_1:
                     if(runtime.seconds()>1) {
-                        leftIntake.setPosition(.75);
-                        rightIntake.setPosition(0.05);
                         leftWinch.setTargetPosition(LIFT_LOW);
                         rightWinch.setTargetPosition(LIFT_LOW);
+                    }
+                    if(runtime.seconds()>1.5){
+                        leftIntake.setPosition(.75);
+                        rightIntake.setPosition(0.05);
                         chainBar.setTargetPosition(ARM_LOW);
                     }
                     if(runtime.seconds()>2.5) {
@@ -263,10 +269,15 @@ public class LeftAuto extends LinearOpMode {
                     break;
                 case TRAJECTORY_4:
                     if (!drive.isBusy()) {
+                        currentState = State.TRAJECTORY_4_5;
+                        drive.followTrajectoryAsync(trajectory4_5);
+                    }
+                    break;
+                case TRAJECTORY_4_5:
+                    if(!drive.isBusy()){
                         currentState = State.TURN_1;
                         drive.turnAsync(Math.toRadians(90));
                     }
-                    break;
                 case TURN_1:
                     if(!drive.isBusy()){
                         currentState = State.TRAJECTORY_5;
@@ -314,12 +325,12 @@ public class LeftAuto extends LinearOpMode {
                     break;
                 case WAIT_3:
 
-                    if(runtime.seconds()>2.5) {
+                    if(runtime.seconds()>2.3) {
 
                         leftWinch.setTargetPosition(LIFT_LOW);
                         rightWinch.setTargetPosition(LIFT_LOW);
                     }
-                    if(runtime.seconds()>2.9){
+                    if(runtime.seconds()>3){
                         rightIntake.setPosition(0.05);
                         leftIntake.setPosition(.75);
                     }
