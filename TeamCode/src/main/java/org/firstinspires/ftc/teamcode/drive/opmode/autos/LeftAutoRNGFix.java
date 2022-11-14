@@ -63,7 +63,7 @@ public class LeftAutoRNGFix extends LinearOpMode {
     final int TURRET_RIGHT = -1400;
     final int TURRET_CENTER = 0;
 
-    final int ARM_5CONE = 590;
+    final int ARM_5CONE = 630;
 
 
     private ElapsedTime runtime = new ElapsedTime();
@@ -171,7 +171,7 @@ public class LeftAutoRNGFix extends LinearOpMode {
 
         // Trajectory 2: move to the base of the mid height pole
         Trajectory trajectory2 = drive.trajectoryBuilder(trajectory1.end())
-                .lineTo(new Vector2d(27.7, -10.8))
+                .lineTo(new Vector2d(28, -11))
                 .build();
         // Trajectory 3: return to center lane
         Trajectory trajectory3 = drive.trajectoryBuilder(trajectory2.end())
@@ -186,29 +186,29 @@ public class LeftAutoRNGFix extends LinearOpMode {
                 .build();
         // Trajectory 5: drive left and position to grab cone
         Trajectory trajectory5 = drive.trajectoryBuilder(trajectory4_5.end().plus(new Pose2d(0,0,Math.toRadians(90))))
-                .lineTo(new Vector2d(48, 25.5))
+                .lineTo(new Vector2d(48, 26))
                 .build();
         // Trajectory 6: drive backwards
         Trajectory trajectory6 = drive.trajectoryBuilder(trajectory5.end())
-                .lineTo(new Vector2d(49, 7))
+                .lineTo(new Vector2d(48, 7))
                 .build();
         //Trajectory 7: move to cone placement
         Trajectory trajectory7 = drive.trajectoryBuilder(trajectory6.end())
-                .lineTo(new Vector2d(48.5, -5.9))
+                .lineToConstantHeading(new Vector2d(48, -5.2))
                 .build();
 
         double parkX = 0;
         double parkY = 0;
 
         if (tagOfInterest == null || tagOfInterest.id == LEFT) {
-            parkX = 47;
-            parkY = 26;
+            parkX = 49;
+            parkY = 24.5;
         } else if (tagOfInterest.id == MIDDLE) {
             parkX = 49;
-            parkY = 1;
+            parkY = 3;
         } else if (tagOfInterest.id == RIGHT) {
             parkX = 49;
-            parkY = -21.5;
+            parkY = -22;
         }
         // Trajectory 8: move to the correct parking space
         Trajectory trajectory8 = drive.trajectoryBuilder(trajectory7.end())

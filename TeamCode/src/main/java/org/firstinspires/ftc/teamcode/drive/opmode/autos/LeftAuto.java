@@ -190,7 +190,7 @@ public class LeftAuto extends LinearOpMode {
                 .build();
         //Trajectory 7: move to cone placement
         Trajectory trajectory7 = drive.trajectoryBuilder(trajectory6.end())
-                .lineTo(new Vector2d(48.4, -5.7))
+                .lineTo(new Vector2d(47.4, -5.7))
                 .build();
 
         double parkX = 0;
