@@ -170,7 +170,7 @@ public class LeftAuto extends LinearOpMode {
 
         // Trajectory 2: move to the base of the mid height pole
         Trajectory trajectory2 = drive.trajectoryBuilder(trajectory1.end())
-                .lineTo(new Vector2d(27.2, -11.2))
+                .lineTo(new Vector2d(28, -11))
                 .build();
         // Trajectory 3: return to center lane
         Trajectory trajectory3 = drive.trajectoryBuilder(trajectory2.end())
@@ -182,7 +182,7 @@ public class LeftAuto extends LinearOpMode {
                 .build();
         // Trajectory 5: drive left and position to grab cone
         Trajectory trajectory5 = drive.trajectoryBuilder(trajectory4.end().plus(new Pose2d(0,0,Math.toRadians(90))))
-                .lineTo(new Vector2d(47.5, 25.5))
+                .lineTo(new Vector2d(47.5, 26))
                 .build();
         // Trajectory 6: drive backwards
         Trajectory trajectory6 = drive.trajectoryBuilder(trajectory5.end())
@@ -190,7 +190,7 @@ public class LeftAuto extends LinearOpMode {
                 .build();
         //Trajectory 7: move to cone placement
         Trajectory trajectory7 = drive.trajectoryBuilder(trajectory6.end())
-                .lineTo(new Vector2d(50.5, -6.1))
+                .lineTo(new Vector2d(48.4, -5.7))
                 .build();
 
         double parkX = 0;
@@ -284,14 +284,14 @@ public class LeftAuto extends LinearOpMode {
                     //close claw, wait, raise, wait, move
                     leftIntake.setPosition(.45);
                     rightIntake.setPosition(.35);
-                    if(runtime.seconds()>1.5 && runtime.seconds()<2.25){
+                    if(runtime.seconds()>1.2){
                         leftWinch.setTargetPosition(LIFT_LOW2);
                         rightWinch.setTargetPosition(LIFT_LOW2);
                         chainBar.setTargetPosition(ARM_HIGH);
-                        turret.setTargetPosition(TURRET_RIGHT);
-                        turret.setPower(.5);
                     }
                     if(runtime.seconds()>1.5){
+                        turret.setTargetPosition(TURRET_RIGHT);
+                        turret.setPower(.5);
                         currentState = State.TRAJECTORY_6;
                         drive.followTrajectoryAsync(trajectory6);
                     }

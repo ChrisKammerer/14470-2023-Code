@@ -1,29 +1,27 @@
 package org.firstinspires.ftc.teamcode.drive.opmode.autos;
 
 import com.acmerobotics.dashboard.FtcDashboard;
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-
-
-import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.openftc.apriltag.AprilTagDetection;
-import org.openftc.easyopencv.OpenCvCamera;
-import org.openftc.easyopencv.OpenCvCameraFactory;
-import org.openftc.easyopencv.OpenCvCameraRotation;
-import org.openftc.easyopencv.OpenCvInternalCamera;
-
-import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.util.ElapsedTime;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
+
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
+import org.openftc.apriltag.AprilTagDetection;
+import org.openftc.easyopencv.OpenCvCamera;
+import org.openftc.easyopencv.OpenCvCameraFactory;
+import org.openftc.easyopencv.OpenCvCameraRotation;
+
 import java.util.ArrayList;
 
 @Autonomous
-public class LeftAutoOneCone extends LinearOpMode {
+public class JohnsCodeSucksLeftAuto extends LinearOpMode {
     OpenCvCamera camera;
     AprilTagDetectionPipeline aprilTagDetectionPipeline;
 
@@ -54,16 +52,16 @@ public class LeftAutoOneCone extends LinearOpMode {
     Servo rightIntake;
     final int LIFT_LOW = 0;
     final int LIFT_LOW2 = 1200;
-    final int LIFT_MID = 2800;
-    final int LIFT_HIGH = 4650;
+    final int LIFT_MID = 2950;
+    final int LIFT_HIGH = 4640;
     final int ARM_LOW = 0;
     final int ARM_MID = 1000;
-    final int ARM_HIGH = 1250;
+    final int ARM_HIGH = 1400;
     final int ARM_BACK = -200;
     final int TURRET_RIGHT = -1400;
     final int TURRET_CENTER = 0;
 
-    final int ARM_5CONE = 680;
+    final int ARM_5CONE = 630;
 
 
     private ElapsedTime runtime = new ElapsedTime();
@@ -72,8 +70,16 @@ public class LeftAutoOneCone extends LinearOpMode {
         TRAJECTORY_1, // move forward
         TRAJECTORY_2, // move to mid pole and raise lift
         WAIT_1, // drop cone and lift
-        TRAJECTORY_3, // park
-        TRAJECTORY_4,
+        TRAJECTORY_3, // strafe left
+        TRAJECTORY_4, // forward to cone stack
+        TURN_1, // turn to face cone stack
+        TRAJECTORY_5, // drive to cone stack
+        WAIT_2, // pick up cone1
+        TRAJECTORY_6, // drive away from stack a bit
+        TRAJECTORY_7, //drive to high pole and raise lift
+        WAIT_3, //drop cones and lower lift
+        TRAJECTORY_8, //park
+
         IDLE //end
     }
     State currentState = State.IDLE;
@@ -162,27 +168,44 @@ public class LeftAutoOneCone extends LinearOpMode {
 
         // Trajectory 2: move to the base of the mid height pole
         Trajectory trajectory2 = drive.trajectoryBuilder(trajectory1.end())
-                .lineTo(new Vector2d(28, -10.5))
+                .lineTo(new Vector2d(27.6, -11.2))
                 .build();
+        // Trajectory 3: return to center lane
         Trajectory trajectory3 = drive.trajectoryBuilder(trajectory2.end())
                 .lineTo(new Vector2d(28, 1))
+                .build();
+        // Trajectory 4: move forward to cone x value
+        Trajectory trajectory4 = drive.trajectoryBuilder(trajectory3.end())
+                .lineTo(new Vector2d(50.6, 2.6))
+                .build();
+        // Trajectory 5: drive left and position to grab cone
+        Trajectory trajectory5 = drive.trajectoryBuilder(trajectory4.end().plus(new Pose2d(0,0,Math.toRadians(100))))
+                .lineTo(new Vector2d(46.75, 26.5))
+                .build();
+        // Trajectory 6: drive backwards
+        Trajectory trajectory6 = drive.trajectoryBuilder(trajectory5.end())
+                .lineTo(new Vector2d(47, 25))
+                .build();
+        //Trajectory 7: move to cone placement
+        Trajectory trajectory7 = drive.trajectoryBuilder(trajectory6.end())
+                .lineTo(new Vector2d(49, 20))
                 .build();
 
         double parkX = 0;
         double parkY = 0;
 
         if (tagOfInterest == null || tagOfInterest.id == LEFT) {
-            parkX = 26;
-            parkY = 25;
+            parkX = 49;
+            parkY = 24;
         } else if (tagOfInterest.id == MIDDLE) {
-            parkX = 26;
+            parkX = 49;
             parkY = 0;
         } else if (tagOfInterest.id == RIGHT) {
-            parkX = 26;
-            parkY = -21;
+            parkX = 49;
+            parkY = -22;
         }
-        // Trajectory 3: move to the correct parking space
-        Trajectory trajectory4 = drive.trajectoryBuilder(trajectory3.end())
+        // Trajectory 8: move to the correct parking space
+        Trajectory trajectory8 = drive.trajectoryBuilder(trajectory7.end())
                 .lineTo(new Vector2d(parkX, parkY))
                 .build();
 
@@ -224,7 +247,7 @@ public class LeftAutoOneCone extends LinearOpMode {
                         rightWinch.setTargetPosition(LIFT_LOW);
                         chainBar.setTargetPosition(ARM_LOW);
                     }
-                    if(runtime.seconds()>3.5) {
+                    if(runtime.seconds()>2.5) {
                         currentState = State.TRAJECTORY_3;
                         drive.followTrajectoryAsync(trajectory3);
                     }
@@ -234,9 +257,84 @@ public class LeftAutoOneCone extends LinearOpMode {
                     if (!drive.isBusy()) {
                         currentState = State.TRAJECTORY_4;
                         drive.followTrajectoryAsync(trajectory4);
-                        }
+                    }
                     break;
                 case TRAJECTORY_4:
+                    if (!drive.isBusy()) {
+                        currentState = State.TURN_1;
+                        drive.turnAsync(Math.toRadians(100));
+                    }
+                    break;
+                case TURN_1:
+                    if(!drive.isBusy()){
+                        currentState = State.TRAJECTORY_5;
+                        chainBar.setTargetPosition(ARM_5CONE);
+                        drive.followTrajectoryAsync(trajectory5);
+                    }
+                    break;
+                case TRAJECTORY_5:
+                    if (!drive.isBusy()) {
+                        currentState = State.WAIT_2;
+                        runtime.reset();
+                    }
+                    break;
+                case WAIT_2:
+                    //close claw, wait, raise, wait, move
+                    leftIntake.setPosition(.45);
+                    rightIntake.setPosition(.35);
+                    if(runtime.seconds()>1.5 && runtime.seconds()<2.25){
+                        leftWinch.setTargetPosition(LIFT_LOW2);
+                        rightWinch.setTargetPosition(LIFT_LOW2);
+                        chainBar.setTargetPosition(ARM_MID);
+                        turret.setTargetPosition(TURRET_RIGHT);
+                        turret.setPower(.5);
+                    }
+                    if(runtime.seconds()>1.5){
+                        currentState = State.TRAJECTORY_6;
+                        drive.followTrajectoryAsync(trajectory6);
+                    }
+                    break;
+                case TRAJECTORY_6:
+                    if(!drive.isBusy()){
+
+//                        leftWinch.setTargetPosition(LIFT_HIGH);
+//                        rightWinch.setTargetPosition(LIFT_HIGH);
+//                        leftWinch.setPower(.5);
+//                        rightWinch.setPower(.5);
+                        drive.followTrajectory(trajectory7);
+                        currentState = State.TRAJECTORY_7;
+                    }
+                    break;
+                case TRAJECTORY_7:
+                    if(!drive.isBusy()){
+                        currentState = State.WAIT_3;
+                        runtime.reset();
+                    }
+                    break;
+                case WAIT_3:
+
+                    if(runtime.seconds()>2) {
+                        chainBar.setTargetPosition(ARM_LOW);
+                        leftWinch.setTargetPosition(LIFT_LOW);
+                        rightWinch.setTargetPosition(LIFT_LOW);
+                    }
+                    if(runtime.seconds()>2.5){
+                        rightIntake.setPosition(0.05);
+                        leftIntake.setPosition(.75);
+                        chainBar.setTargetPosition(ARM_HIGH);
+                    }
+                    if(runtime.seconds()>6){
+//                        leftWinch.setTargetPosition(LIFT_LOW);
+//                        rightWinch.setTargetPosition(LIFT_LOW);
+                        turret.setTargetPosition(TURRET_CENTER);
+
+                        chainBar.setTargetPosition(ARM_LOW);
+
+                        drive.followTrajectoryAsync(trajectory8);
+                        currentState = State.TRAJECTORY_8;
+                    }
+                    break;
+                case TRAJECTORY_8:
                     if(!drive.isBusy()){
                         currentState = State.IDLE;
                     }
@@ -245,6 +343,8 @@ public class LeftAutoOneCone extends LinearOpMode {
             }
 
             drive.update();
+            telemetry.addData("state", currentState);
+            telemetry.update();
         }
     }
 }
