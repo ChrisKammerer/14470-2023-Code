@@ -57,7 +57,7 @@ public class LeftAutoRNGFix extends LinearOpMode {
     final int LIFT_MID = 2950;
     final int LIFT_HIGH = 4640;
     final int ARM_LOW = 0;
-    final int ARM_MID = 1000;
+    final int ARM_MID = 920;
     final int ARM_HIGH = 1400;
     final int ARM_BACK = -200;
     final int TURRET_RIGHT = -1400;
@@ -171,7 +171,7 @@ public class LeftAutoRNGFix extends LinearOpMode {
 
         // Trajectory 2: move to the base of the mid height pole
         Trajectory trajectory2 = drive.trajectoryBuilder(trajectory1.end())
-                .lineTo(new Vector2d(27.2, -11.2))
+                .lineTo(new Vector2d(27.7, -10.8))
                 .build();
         // Trajectory 3: return to center lane
         Trajectory trajectory3 = drive.trajectoryBuilder(trajectory2.end())
@@ -186,7 +186,7 @@ public class LeftAutoRNGFix extends LinearOpMode {
                 .build();
         // Trajectory 5: drive left and position to grab cone
         Trajectory trajectory5 = drive.trajectoryBuilder(trajectory4_5.end().plus(new Pose2d(0,0,Math.toRadians(90))))
-                .lineTo(new Vector2d(47.5, 25.5))
+                .lineTo(new Vector2d(48, 25.5))
                 .build();
         // Trajectory 6: drive backwards
         Trajectory trajectory6 = drive.trajectoryBuilder(trajectory5.end())
@@ -194,7 +194,7 @@ public class LeftAutoRNGFix extends LinearOpMode {
                 .build();
         //Trajectory 7: move to cone placement
         Trajectory trajectory7 = drive.trajectoryBuilder(trajectory6.end())
-                .lineTo(new Vector2d(50.5, -6.1))
+                .lineTo(new Vector2d(48.5, -5.9))
                 .build();
 
         double parkX = 0;
@@ -202,13 +202,13 @@ public class LeftAutoRNGFix extends LinearOpMode {
 
         if (tagOfInterest == null || tagOfInterest.id == LEFT) {
             parkX = 47;
-            parkY = 25;
+            parkY = 26;
         } else if (tagOfInterest.id == MIDDLE) {
             parkX = 49;
             parkY = 1;
         } else if (tagOfInterest.id == RIGHT) {
             parkX = 49;
-            parkY = -22;
+            parkY = -21.5;
         }
         // Trajectory 8: move to the correct parking space
         Trajectory trajectory8 = drive.trajectoryBuilder(trajectory7.end())
@@ -295,10 +295,12 @@ public class LeftAutoRNGFix extends LinearOpMode {
                     //close claw, wait, raise, wait, move
                     leftIntake.setPosition(.45);
                     rightIntake.setPosition(.35);
-                    if(runtime.seconds()>1.5 && runtime.seconds()<2.25){
+                    if(runtime.seconds()>1){
                         leftWinch.setTargetPosition(LIFT_LOW2);
                         rightWinch.setTargetPosition(LIFT_LOW2);
                         chainBar.setTargetPosition(ARM_HIGH);
+                    }
+                    if(runtime.seconds()>1.4){
                         turret.setTargetPosition(TURRET_RIGHT);
                         turret.setPower(.5);
                     }
@@ -325,16 +327,16 @@ public class LeftAutoRNGFix extends LinearOpMode {
                     break;
                 case WAIT_3:
 
-                    if(runtime.seconds()>2.3) {
+                    if(runtime.seconds()>2.9) {
 
                         leftWinch.setTargetPosition(LIFT_LOW);
                         rightWinch.setTargetPosition(LIFT_LOW);
                     }
-                    if(runtime.seconds()>3){
+                    if(runtime.seconds()>3.6){
                         rightIntake.setPosition(0.05);
                         leftIntake.setPosition(.75);
                     }
-                    if(runtime.seconds()>3){
+                    if(runtime.seconds()>3.6){
                         drive.followTrajectoryAsync(trajectory8);
                         currentState = State.TRAJECTORY_8;
                         runtime.reset();
@@ -344,6 +346,7 @@ public class LeftAutoRNGFix extends LinearOpMode {
                     if(runtime.seconds()>1){
                         turret.setTargetPosition(TURRET_CENTER);
                         chainBar.setTargetPosition(ARM_LOW);
+                        chainBar.setPower(1);
                     }
                     if(!drive.isBusy()){
                         currentState = State.IDLE;

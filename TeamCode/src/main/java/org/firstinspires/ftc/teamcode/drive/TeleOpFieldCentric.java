@@ -63,7 +63,7 @@ public class TeleOpFieldCentric extends LinearOpMode {
         rightIntake.setPosition(0.05);
 
         leftWinch.setDirection(DcMotor.Direction.REVERSE);
-        chainBar.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//        chainBar.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         leftWinch.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightWinch.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         turret.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -227,10 +227,18 @@ public class TeleOpFieldCentric extends LinearOpMode {
             if(gamepad1.left_trigger!=0) {
                 chainBar.setPower(-gamepad1.left_trigger);
             }
+//            if(gamepad1.left_trigger!=0){
+//                chainBar.setTargetPosition(chainBar.getCurrentPosition()-200);
+//            }
+//            else if(gamepad1.right_trigger!=0){
+//                chainBar.setTargetPosition(chainBar.getCurrentPosition()+200);
+//            }
+//            chainBar.setPower(1);
             //reset FOD
             if (gamepad1.right_stick_button)
                 subtractHeading = drive.getPoseEstimate().getHeading();
-
+            if(gamepad1.left_stick_button)
+                subtractHeading = drive.getPoseEstimate().getHeading()-Math.toRadians(90);
             // Read pose
             Pose2d poseEstimate = drive.getPoseEstimate();
             // Create a vector from the gamepad x/y inputs
