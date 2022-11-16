@@ -193,15 +193,15 @@ public class LeftAutoRNGFix extends LinearOpMode {
                 .build();
         // Trajectory 6: drive backwards
         Trajectory trajectory6 = drive.trajectoryBuilder(trajectory5.end())
-                .lineToConstantHeading(new Vector2d(48.5, 7))
+                .lineToConstantHeading(new Vector2d(49, 7))
                 .build();
         //Trajectory 7: move to cone placement
         Trajectory trajectory7 = drive.trajectoryBuilder(trajectory6.end().plus(new Pose2d(0,0,Math.toRadians(-45))))
-                .lineToConstantHeading(new Vector2d(53, 1.8))
+                .lineToConstantHeading(new Vector2d(52.7, 2.1))
                 .build();
         //Trajectory 7_5: move back to pre placement position
         Trajectory trajectory7_5 = drive.trajectoryBuilder(trajectory7.end())
-                .lineToConstantHeading(new Vector2d(48.5, 7))
+                .lineToConstantHeading(new Vector2d(49, 7))
                 .build();
 
         double parkX = 0;
@@ -215,7 +215,7 @@ public class LeftAutoRNGFix extends LinearOpMode {
             parkY = 3.3;
         } else if (tagOfInterest.id == RIGHT) {
             parkX = 52;
-            parkY = -21.3;
+            parkY = -21;
         }
         // Trajectory 8: move to the correct parking space
         Trajectory trajectory8 = drive.trajectoryBuilder(trajectory7_5.end().plus(new Pose2d(0,0,Math.toRadians(45))))
