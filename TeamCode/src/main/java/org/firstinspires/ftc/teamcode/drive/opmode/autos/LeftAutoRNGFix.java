@@ -60,10 +60,10 @@ public class LeftAutoRNGFix extends LinearOpMode {
     final int ARM_MID = 920;
     final int ARM_HIGH = 1400;
     final int ARM_BACK = -200;
-    final int TURRET_RIGHT = -1400;
+    final int TURRET_RIGHT = -1260;
     final int TURRET_CENTER = 0;
 
-    final int ARM_5CONE = 630;
+    final int ARM_5CONE = 690;
 
 
     private ElapsedTime runtime = new ElapsedTime();
@@ -79,8 +79,11 @@ public class LeftAutoRNGFix extends LinearOpMode {
         TRAJECTORY_5, // drive to cone stack
         WAIT_2, // pick up cone1
         TRAJECTORY_6, // drive away from stack a bit
+        TURN_2, // Turn to face pole
         TRAJECTORY_7, //drive to high pole and raise lift
         WAIT_3, //drop cones and lower lift
+        TRAJECTORY_7_5, //return to pre placement position
+        TURN_3,
         TRAJECTORY_8, //park
 
         IDLE //end
@@ -171,7 +174,7 @@ public class LeftAutoRNGFix extends LinearOpMode {
 
         // Trajectory 2: move to the base of the mid height pole
         Trajectory trajectory2 = drive.trajectoryBuilder(trajectory1.end())
-                .lineTo(new Vector2d(28, -11))
+                .lineTo(new Vector2d(27.5, -10.5))
                 .build();
         // Trajectory 3: return to center lane
         Trajectory trajectory3 = drive.trajectoryBuilder(trajectory2.end())
@@ -190,11 +193,15 @@ public class LeftAutoRNGFix extends LinearOpMode {
                 .build();
         // Trajectory 6: drive backwards
         Trajectory trajectory6 = drive.trajectoryBuilder(trajectory5.end())
-                .lineTo(new Vector2d(48, 7))
+                .lineToConstantHeading(new Vector2d(48.5, 7))
                 .build();
         //Trajectory 7: move to cone placement
-        Trajectory trajectory7 = drive.trajectoryBuilder(trajectory6.end())
-                .lineToConstantHeading(new Vector2d(48, -5.2))
+        Trajectory trajectory7 = drive.trajectoryBuilder(trajectory6.end().plus(new Pose2d(0,0,Math.toRadians(-45))))
+                .lineToConstantHeading(new Vector2d(53, 1.8))
+                .build();
+        //Trajectory 7_5: move back to pre placement position
+        Trajectory trajectory7_5 = drive.trajectoryBuilder(trajectory7.end())
+                .lineToConstantHeading(new Vector2d(48.5, 7))
                 .build();
 
         double parkX = 0;
@@ -202,16 +209,16 @@ public class LeftAutoRNGFix extends LinearOpMode {
 
         if (tagOfInterest == null || tagOfInterest.id == LEFT) {
             parkX = 49;
-            parkY = 24.5;
+            parkY = 25;
         } else if (tagOfInterest.id == MIDDLE) {
-            parkX = 49;
-            parkY = 3;
+            parkX = 48.5;
+            parkY = 3.3;
         } else if (tagOfInterest.id == RIGHT) {
-            parkX = 49;
-            parkY = -22;
+            parkX = 52;
+            parkY = -21.3;
         }
         // Trajectory 8: move to the correct parking space
-        Trajectory trajectory8 = drive.trajectoryBuilder(trajectory7.end())
+        Trajectory trajectory8 = drive.trajectoryBuilder(trajectory7_5.end().plus(new Pose2d(0,0,Math.toRadians(45))))
                 .lineTo(new Vector2d(parkX, parkY))
                 .build();
 
@@ -246,16 +253,16 @@ public class LeftAutoRNGFix extends LinearOpMode {
                     }
                     break;
                 case WAIT_1:
-                    if(runtime.seconds()>1) {
+                    if(runtime.seconds()>1.5) {
                         leftWinch.setTargetPosition(LIFT_LOW);
                         rightWinch.setTargetPosition(LIFT_LOW);
                     }
-                    if(runtime.seconds()>1.5){
+                    if(runtime.seconds()>2){
                         leftIntake.setPosition(.75);
                         rightIntake.setPosition(0.05);
                         chainBar.setTargetPosition(ARM_LOW);
                     }
-                    if(runtime.seconds()>2.5) {
+                    if(runtime.seconds()>3) {
                         currentState = State.TRAJECTORY_3;
                         drive.followTrajectoryAsync(trajectory3);
                     }
@@ -315,6 +322,12 @@ public class LeftAutoRNGFix extends LinearOpMode {
                         rightWinch.setTargetPosition(LIFT_HIGH);
                         leftWinch.setPower(.5);
                         rightWinch.setPower(.5);
+                        currentState = State.TURN_2;
+                    }
+                    break;
+                case TURN_2:
+                    if(!drive.isBusy()){
+                        drive.turnAsync(Math.toRadians(-45));
                         drive.followTrajectory(trajectory7);
                         currentState = State.TRAJECTORY_7;
                     }
@@ -337,20 +350,33 @@ public class LeftAutoRNGFix extends LinearOpMode {
                         leftIntake.setPosition(.75);
                     }
                     if(runtime.seconds()>3.6){
+                        currentState = State.TRAJECTORY_7_5;
+                        drive.followTrajectoryAsync(trajectory7_5);
+                    }
+                    break;
+                case TRAJECTORY_7_5:
+                    if(!drive.isBusy()) {
+                        turret.setTargetPosition(TURRET_CENTER);
+                        currentState = State.TURN_3;
+                    }
+                    break;
+                case TURN_3:
+                    if(!drive.isBusy()) {
+                        drive.turnAsync(Math.toRadians(45));
                         drive.followTrajectoryAsync(trajectory8);
                         currentState = State.TRAJECTORY_8;
                         runtime.reset();
                     }
                     break;
                 case TRAJECTORY_8:
-                    if(runtime.seconds()>1){
-                        turret.setTargetPosition(TURRET_CENTER);
+                    if(runtime.seconds()>1.5){
                         chainBar.setTargetPosition(ARM_LOW);
                         chainBar.setPower(1);
                     }
                     if(!drive.isBusy()){
                         currentState = State.IDLE;
                     }
+                    break;
                 case IDLE:
                     leftWinch.setTargetPosition(LIFT_LOW);
                     rightWinch.setTargetPosition(LIFT_LOW);
