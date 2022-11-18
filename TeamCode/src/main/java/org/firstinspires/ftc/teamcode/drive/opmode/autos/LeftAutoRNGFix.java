@@ -189,7 +189,7 @@ public class LeftAutoRNGFix extends LinearOpMode {
                 .build();
         // Trajectory 5: drive left and position to grab cone
         Trajectory trajectory5 = drive.trajectoryBuilder(trajectory4_5.end().plus(new Pose2d(0,0,Math.toRadians(90))))
-                .lineTo(new Vector2d(47.5, 26))
+                .lineTo(new Vector2d(47.5, 26.2))
                 .build();
         // Trajectory 6: drive backwards
         Trajectory trajectory6 = drive.trajectoryBuilder(trajectory5.end())
