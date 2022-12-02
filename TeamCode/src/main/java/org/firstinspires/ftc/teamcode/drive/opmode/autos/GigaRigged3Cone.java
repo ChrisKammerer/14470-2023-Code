@@ -203,7 +203,7 @@ public class GigaRigged3Cone extends LinearOpMode {
                 .build();
         //Trajectory 7: move to cone placement
         Trajectory trajectory7 = drive.trajectoryBuilder(trajectory6.end().plus(new Pose2d(0,0,Math.toRadians(-45))))
-                .lineToConstantHeading(new Vector2d(52.7, 2.1))
+                .lineToConstantHeading(new Vector2d(53, 2.1))
                 .build();
         //Trajectory 7_5: move back to pre placement position
         Trajectory trajectory7_5 = drive.trajectoryBuilder(trajectory7.end())
