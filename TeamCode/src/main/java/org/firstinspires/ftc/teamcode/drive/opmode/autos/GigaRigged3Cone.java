@@ -219,7 +219,7 @@ public class GigaRigged3Cone extends LinearOpMode {
                 .build();
         //Trajectory 10: move to pole x position
         Trajectory trajectory10 = drive.trajectoryBuilder(trajectory9.end())
-                .lineTo(new Vector2d(36.8, 4))
+                .lineTo(new Vector2d(37.2, 4.5))
                 .build();
         //Trajectory 10: move to center
         Trajectory trajectory11 = drive.trajectoryBuilder(trajectory10.end())
@@ -234,7 +234,7 @@ public class GigaRigged3Cone extends LinearOpMode {
             parkY = 25.6;
         } else if (tagOfInterest.id == MIDDLE) {
             parkX = 49;
-            parkY = 2.9;
+            parkY = 3.2;
         } else if (tagOfInterest.id == RIGHT) {
             parkX = 52;
             parkY = -21;
