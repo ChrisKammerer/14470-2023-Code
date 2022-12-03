@@ -236,8 +236,8 @@ public class GigaRigged3Cone extends LinearOpMode {
             parkX = 49;
             parkY = 3.2;
         } else if (tagOfInterest.id == RIGHT) {
-            parkX = 52;
-            parkY = -21;
+            parkX = 51.5;
+            parkY = -20;
         }
         // Trajectory Park: move to the correct parking space
         Trajectory trajectoryPark = drive.trajectoryBuilder(trajectory11.end())
