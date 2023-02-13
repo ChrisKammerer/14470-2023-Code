@@ -177,10 +177,9 @@ public class GigaRigged3Cone extends LinearOpMode {
         Trajectory trajectory1 = drive.trajectoryBuilder(startPose)
                 .lineTo(new Vector2d(26, 0))
                 .build();
-
         // Trajectory 2: move to the base of the mid height pole
         Trajectory trajectory2 = drive.trajectoryBuilder(trajectory1.end())
-                .lineTo(new Vector2d(27.8, -10))
+                .lineTo(new Vector2d(27.6, -10.9))
                 .build();
         // Trajectory 3: return to center lane
         Trajectory trajectory3 = drive.trajectoryBuilder(trajectory2.end())
@@ -203,7 +202,7 @@ public class GigaRigged3Cone extends LinearOpMode {
                 .build();
         //Trajectory 7: move to cone placement
         Trajectory trajectory7 = drive.trajectoryBuilder(trajectory6.end().plus(new Pose2d(0,0,Math.toRadians(-45))))
-                .lineToConstantHeading(new Vector2d(52.9, 1.9))
+                .lineToConstantHeading(new Vector2d(52.7, 2.7))
                 .build();
         //Trajectory 7_5: move back to pre placement position
         Trajectory trajectory7_5 = drive.trajectoryBuilder(trajectory7.end())
@@ -219,7 +218,7 @@ public class GigaRigged3Cone extends LinearOpMode {
                 .build();
         //Trajectory 10: move to pole x position
         Trajectory trajectory10 = drive.trajectoryBuilder(trajectory9.end())
-                .lineTo(new Vector2d(37.3, 4.7))
+                .lineTo(new Vector2d(37.05, 4.7))
                 .build();
         //Trajectory 10: move to center
         Trajectory trajectory11 = drive.trajectoryBuilder(trajectory10.end())
@@ -230,11 +229,11 @@ public class GigaRigged3Cone extends LinearOpMode {
         double parkY = 0;
 
         if (tagOfInterest == null || tagOfInterest.id == LEFT) {
-            parkX = 48.5;
-            parkY = 25.9;
+            parkX = 48.55;
+            parkY = 26.2;
         } else if (tagOfInterest.id == MIDDLE) {
-            parkX = 49;
-            parkY = 3.3;
+            parkX = 49.2;
+            parkY = 3.28;
         } else if (tagOfInterest.id == RIGHT) {
             parkX = 51.8;
             parkY = -20.2;

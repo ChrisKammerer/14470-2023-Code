@@ -16,7 +16,7 @@ public class TeleOpFieldCentric extends LinearOpMode {
 
     DcMotor leftWinch;
     DcMotor rightWinch;
-    DcMotor turret;
+    //DcMotor turret;
     DcMotor chainBar;
     Servo leftIntake;
     Servo rightIntake;
@@ -55,7 +55,7 @@ public class TeleOpFieldCentric extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         leftWinch = hardwareMap.dcMotor.get("leftWinch");
         rightWinch = hardwareMap.dcMotor.get("rightWinch");
-        turret = hardwareMap.dcMotor.get("turret");
+        //turret = hardwareMap.dcMotor.get("turret");
         chainBar = hardwareMap.dcMotor.get("chainBar");
         leftIntake = hardwareMap.servo.get("leftIntake");
         rightIntake = hardwareMap.servo.get("rightIntake");
@@ -66,8 +66,8 @@ public class TeleOpFieldCentric extends LinearOpMode {
 //        chainBar.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         leftWinch.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightWinch.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        turret.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        turret.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        turret.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//        turret.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         leftWinch.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightWinch.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 //        chainBar.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -188,11 +188,11 @@ public class TeleOpFieldCentric extends LinearOpMode {
 //                    break;
 //            }
             // rotate turret
-            if(gamepad2.dpad_left)
-                turret.setPower(.8);
-            else if(gamepad2.dpad_right)
-                turret.setPower(-.8);
-            else turret.setPower(0);
+//            if(gamepad2.dpad_left)
+//                turret.setPower(.8);
+//            else if(gamepad2.dpad_right)
+//                turret.setPower(-.8);
+//            else turret.setPower(0);
 
             //intake
             if(gamepad2.right_bumper) {
@@ -270,7 +270,7 @@ public class TeleOpFieldCentric extends LinearOpMode {
             telemetry.addData("state", liftState);
             telemetry.addData("winchCount", leftWinch.getCurrentPosition());
             telemetry.addData("armCount", chainBar.getCurrentPosition());
-            telemetry.addData("turretCount", turret.getCurrentPosition());
+//            telemetry.addData("turretCount", turret.getCurrentPosition());
             telemetry.update();
             // Update everything. Odometry. Etc.
             drive.update();

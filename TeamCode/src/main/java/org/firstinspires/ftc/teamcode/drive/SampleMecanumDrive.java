@@ -53,10 +53,10 @@ import static org.firstinspires.ftc.teamcode.drive.DriveConstants.kV;
  */
 @Config
 public class SampleMecanumDrive extends MecanumDrive {
-    public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(12, 0, 0);
-    public static PIDCoefficients HEADING_PID = new PIDCoefficients(12, 0, 0);
+    public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(0.5, 0, 0.02);
+    public static PIDCoefficients HEADING_PID = new PIDCoefficients(3.5, 0, 0.04);
 
-    public static double LATERAL_MULTIPLIER = 1.35;
+    public static double LATERAL_MULTIPLIER = 1.44;
 
     public static double VX_WEIGHT = 1;
     public static double VY_WEIGHT = 1;
@@ -273,8 +273,8 @@ public class SampleMecanumDrive extends MecanumDrive {
     @Override
     public Double getExternalHeadingVelocity() {
         // To work around an SDK bug, use -zRotationRate in place of xRotationRate
-        // and -xRotationRate in place of zRotationRate (yRotationRate behaves as 
-        // expected). This bug does NOT affect orientation. 
+        // and -xRotationRate in place of zRotationRate (yRotationRate behaves as
+        // expected). This bug does NOT affect orientation.
         //
         // See https://github.com/FIRST-Tech-Challenge/FtcRobotController/issues/251 for details.
         return (double) -imu.getAngularVelocity().xRotationRate;

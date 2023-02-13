@@ -23,7 +23,7 @@ import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import java.util.ArrayList;
 
 @Autonomous
-public class LeftAutoOneCone extends LinearOpMode {
+public class RightAutoOneCone extends LinearOpMode {
     OpenCvCamera camera;
     AprilTagDetectionPipeline aprilTagDetectionPipeline;
 
@@ -157,29 +157,29 @@ public class LeftAutoOneCone extends LinearOpMode {
 
         // Trajectory 1: move forward
         Trajectory trajectory1 = drive.trajectoryBuilder(startPose)
-                .lineTo(new Vector2d(26, 0))
+                .lineTo(new Vector2d(25.9, 0))
                 .build();
 
         // Trajectory 2: move to the base of the mid height pole
         Trajectory trajectory2 = drive.trajectoryBuilder(trajectory1.end())
-                .lineTo(new Vector2d(27.2, -9.9))
+                .lineTo(new Vector2d(29.5, 12.7))
                 .build();
         Trajectory trajectory3 = drive.trajectoryBuilder(trajectory2.end())
-                .lineTo(new Vector2d(26, 1))
+                .lineTo(new Vector2d(25.7, 0))
                 .build();
 
         double parkX = 0;
         double parkY = 0;
 
         if (tagOfInterest == null || tagOfInterest.id == LEFT) {
-            parkX = 26;
-            parkY = 26;
+            parkX = 24.9;
+            parkY = 24;
         } else if (tagOfInterest.id == MIDDLE) {
-            parkX = 26;
-            parkY = 2;
+            parkX = 25.8;
+            parkY = 0;
         } else if (tagOfInterest.id == RIGHT) {
-            parkX = 26;
-            parkY = -21;
+            parkX = 30;
+            parkY = -24.1;
         }
         // Trajectory 3: move to the correct parking space
         Trajectory trajectory4 = drive.trajectoryBuilder(trajectory3.end())
@@ -220,11 +220,11 @@ public class LeftAutoOneCone extends LinearOpMode {
                     if(runtime.seconds()>1.5) {
                         leftWinch.setTargetPosition(LIFT_LOW);
                         rightWinch.setTargetPosition(LIFT_LOW);
-                    if(runtime.seconds()>2.3) {
-                        leftIntake.setPosition(.75);
-                        rightIntake.setPosition(0.05);
-                        chainBar.setTargetPosition(ARM_LOW);
-                    }
+                        if(runtime.seconds()>2.3) {
+                            leftIntake.setPosition(.75);
+                            rightIntake.setPosition(0.05);
+                            chainBar.setTargetPosition(ARM_LOW);
+                        }
                     }
                     if(runtime.seconds()>3.5) {
                         currentState = State.TRAJECTORY_3;
@@ -236,7 +236,7 @@ public class LeftAutoOneCone extends LinearOpMode {
                     if (!drive.isBusy()) {
                         currentState = State.TRAJECTORY_4;
                         drive.followTrajectoryAsync(trajectory4);
-                        }
+                    }
                     break;
                 case TRAJECTORY_4:
                     if(!drive.isBusy()){
