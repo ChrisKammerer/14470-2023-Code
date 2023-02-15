@@ -16,7 +16,6 @@ public class TeleOpFieldCentricV2 extends LinearOpMode {
 
     DcMotor leftWinch;
     DcMotor rightWinch;
-    //DcMotor turret;
     DcMotor chainBar;
     Servo leftIntake;
     Servo rightIntake;
@@ -25,27 +24,11 @@ public class TeleOpFieldCentricV2 extends LinearOpMode {
     //final double CHAIN_BAR_DELAY_TIME = 0.0;
     //private ElapsedTime liftTimer = new ElapsedTime();
 
-    public enum LiftState {
-        LIFT_START,
-        LIFT_EXTEND,
-        LIFT_RETRACT
-    }
-
-    public enum ArmState {
-        ARM_UPPER,
-        ARM_LOWER,
-        ARM_MIDDLE,
-        ARM_REVERSE
-    }
-
-    LiftState liftState = LiftState.LIFT_START;
-    ArmState armState = ArmState.ARM_LOWER;
-
 
     final int LIFT_BOTTOM = 0;
-    final int LIFT_LOW = 784;
-    final int LIFT_MID = 2000;
-    final int LIFT_HIGH = 3300;
+    final int LIFT_LOW = 850;
+    final int LIFT_MID = 2150;
+    final int LIFT_HIGH = 3375;
 
     final int ARM_0 = 0;
     final int ARM_1 = 138;
@@ -61,8 +44,8 @@ public class TeleOpFieldCentricV2 extends LinearOpMode {
     final double RCLAW_MID = .16;
     final double LCLAW_OPEN = .75;
     final double RCLAW_OPEN = .05;
-    final double LCLAW_CLOSE = .50;
-    final double RCLAW_CLOSE = .30;
+    final double LCLAW_CLOSE = .55;
+    final double RCLAW_CLOSE = .24;
 
 
     int liftGoal = 0;
@@ -120,15 +103,6 @@ public class TeleOpFieldCentricV2 extends LinearOpMode {
                 chainBar.setPower(1);
             }
 
-//            if(gamepad1.right_trigger>.05){
-//                chainBar.setTargetPosition(chainBar.getCurrentPosition()+
-//                        (int)((10*gamepad1.right_trigger)));
-//            }
-//            if(gamepad1.left_trigger>.05){
-//                chainBar.setTargetPosition(chainBar.getCurrentPosition()-
-//                        (int)((10*gamepad1.left_trigger)));
-//            }
-
             chainBar.setPower(gamepad1.right_trigger);
             if(gamepad1.left_trigger!=0) {
                 chainBar.setPower(-gamepad1.left_trigger);
@@ -178,10 +152,14 @@ public class TeleOpFieldCentricV2 extends LinearOpMode {
 
 
             //FOD ---------------------------------------------------------------------
-            if (gamepad1.right_stick_button)
+            if (gamepad1.dpad_right)
+                subtractHeading = drive.getPoseEstimate().getHeading()-Math.toRadians(270);
+            if(gamepad1.dpad_up)
                 subtractHeading = drive.getPoseEstimate().getHeading();
-            if(gamepad1.left_stick_button)
+            if(gamepad1.dpad_left)
                 subtractHeading = drive.getPoseEstimate().getHeading()-Math.toRadians(90);
+            if(gamepad1.dpad_down||gamepad1.left_stick_button)
+                subtractHeading = drive.getPoseEstimate().getHeading()-Math.toRadians(180);
             // Read pose
             Pose2d poseEstimate = drive.getPoseEstimate();
             // Create a vector from the gamepad x/y inputs
@@ -210,7 +188,6 @@ public class TeleOpFieldCentricV2 extends LinearOpMode {
                         )
                 );
             }
-            telemetry.addData("state", liftState);
             telemetry.addData("winchCount", leftWinch.getCurrentPosition());
             telemetry.addData("armCount", chainBar.getCurrentPosition());
 //            telemetry.addData("turretCount", turret.getCurrentPosition());
