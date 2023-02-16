@@ -8,6 +8,7 @@ import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -60,6 +61,7 @@ public class RedLeftV2 extends LinearOpMode {
     final int ARM_3 = 376;
     final int ARM_4 = 540;
     final int ARM_5 = 667;
+    final int ARM_UP_FRONT = 875;
     final int ARM_MID = 1340;
     final int ARM_BACK_POLE = 1956;
     final int ARM_BACK_FULL = 2500;
@@ -75,8 +77,12 @@ public class RedLeftV2 extends LinearOpMode {
     private ElapsedTime runtime = new ElapsedTime();
 
     enum State{
-        TRAJECTORY_1, // move forward
-        IDLE //end
+        TRAJECTORY_1, // move forward & spline
+        TRAJECTORY_2, // back up and turn
+        TRAJECTORY_3, // move to cones
+        TRAJECTORY_4, // back up to pole
+        TRAJECTORY_5, // move to cones 2
+        IDLE, //end
     }
     State currentState = State.IDLE;
 
@@ -89,6 +95,8 @@ public class RedLeftV2 extends LinearOpMode {
         leftIntake = hardwareMap.servo.get("leftIntake");
         rightIntake = hardwareMap.servo.get("rightIntake");
 
+        leftWinch.setDirection(DcMotor.Direction.REVERSE);
+        rightWinch.setDirection(DcMotorSimple.Direction.REVERSE);
         chainBar.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         leftWinch.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightWinch.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -132,7 +140,7 @@ public class RedLeftV2 extends LinearOpMode {
         //CREATE TRAJECTORIES HERE
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
-        Pose2d startPose = new Pose2d(0, 0, 0);
+        Pose2d startPose = new Pose2d(0, 0, Math.toRadians(0));
         while (!isStarted() && !isStopRequested()) {
             ArrayList<AprilTagDetection> currentDetections = aprilTagDetectionPipeline.getLatestDetections();
             if (currentDetections.size() != 0) {
@@ -156,6 +164,17 @@ public class RedLeftV2 extends LinearOpMode {
             sleep(20);
         }
 
+        Trajectory trajectory1 = drive.trajectoryBuilder(startPose)
+                .lineToConstantHeading(new Vector2d(39, 0))
+                .splineTo(new Vector2d(47.9,-9.5), Math.toRadians(-48))
+                .build();
+        Trajectory trajectory2 = drive.trajectoryBuilder(trajectory1.end())
+                .lineToLinearHeading(new Pose2d(46, 0, Math.toRadians(80)))
+                .build();
+        Trajectory trajectory3 = drive.trajectoryBuilder(trajectory2.end())
+                .lineToLinearHeading(new Pose2d(48, 20, Math.toRadians(90)))
+                .build();
+
 
 
         double parkX = 0;
@@ -178,8 +197,8 @@ public class RedLeftV2 extends LinearOpMode {
         if (isStopRequested()) return;
 
         currentState = State.TRAJECTORY_1;
-//        drive.followTrajectoryAsync(trajectory1);
-
+        drive.followTrajectoryAsync(trajectory1);
+        runtime.reset();
         while (opModeIsActive() && !isStopRequested()) {
 
             switch (currentState) {
@@ -187,7 +206,39 @@ public class RedLeftV2 extends LinearOpMode {
                     leftIntake.setPosition(LCLAW_CLOSE);
                     rightIntake.setPosition(RCLAW_CLOSE);
 
+                    chainBar.setTargetPosition(ARM_UP_FRONT);
+                    chainBar.setPower(.5);
+                    leftWinch.setTargetPosition(LIFT_HIGH);
+                    rightWinch.setTargetPosition(LIFT_HIGH);
+                    if(runtime.seconds()>.5){
+                        leftWinch.setPower(.75);
+                        rightWinch.setPower(.75);
+                    }
+                    if(runtime.seconds()>3){
+                        leftWinch.setTargetPosition(LIFT_BOTTOM);
+                        rightWinch.setTargetPosition(LIFT_BOTTOM);
+                    }
+                    if(!drive.isBusy()&&runtime.seconds()>3.5){
+                        currentState = State.TRAJECTORY_2;
+                        leftIntake.setPosition(LCLAW_MID);
+                        rightIntake.setPosition(RCLAW_MID);
+                        chainBar.setTargetPosition(ARM_MID);
+                        drive.followTrajectoryAsync(trajectory2);
+                    }
                     break;
+                case TRAJECTORY_2:
+                    if(!drive.isBusy()){
+                        drive.followTrajectoryAsync(trajectory3);
+                        currentState = State.IDLE;
+                    }
+                    break;
+                case TRAJECTORY_3:
+                    if(!drive.isBusy()){
+                        currentState = State.IDLE;
+                    }
+                case IDLE:
+                    break;
+
             }
 
             drive.update();

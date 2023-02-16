@@ -190,6 +190,10 @@ public class TeleOpFieldCentricV2 extends LinearOpMode {
             }
             telemetry.addData("winchCount", leftWinch.getCurrentPosition());
             telemetry.addData("armCount", chainBar.getCurrentPosition());
+            telemetry.addLine("----------------------------");
+            telemetry.addData("x", poseEstimate.getX());
+            telemetry.addData("y", poseEstimate.getY());
+            telemetry.addData("heading", poseEstimate.getHeading());
 //            telemetry.addData("turretCount", turret.getCurrentPosition());
             telemetry.update();
             // Update everything. Odometry. Etc.
