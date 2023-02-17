@@ -165,18 +165,17 @@ public class RedLeftV2 extends LinearOpMode {
         }
 
         Trajectory trajectory1 = drive.trajectoryBuilder(startPose)
-                .lineToConstantHeading(new Vector2d(39, 0))
-                .splineTo(new Vector2d(47.9,-9.5), Math.toRadians(-48))
+                .lineToConstantHeading(new Vector2d(40, 0))
+                .splineTo(new Vector2d(45.8,-6), 5.45)
                 .build();
         Trajectory trajectory2 = drive.trajectoryBuilder(trajectory1.end())
-                .lineToLinearHeading(new Pose2d(46, 0, Math.toRadians(80)))
+                .lineToLinearHeading(new Pose2d(42, -2, Math.toRadians(90)))
                 .build();
         Trajectory trajectory3 = drive.trajectoryBuilder(trajectory2.end())
-                .lineToLinearHeading(new Pose2d(48, 20, Math.toRadians(90)))
+                .lineToLinearHeading(new Pose2d(53.7, 21.6, Math.toRadians(90)))
                 .build();
 
-
-
+        //TODO: split trajectory 1 into 2 trajectories, and replace the spline with a lineToLinearHeading
         double parkX = 0;
         double parkY = 0;
 
@@ -197,8 +196,9 @@ public class RedLeftV2 extends LinearOpMode {
         if (isStopRequested()) return;
 
         currentState = State.TRAJECTORY_1;
-        drive.followTrajectoryAsync(trajectory1);
         runtime.reset();
+        drive.followTrajectoryAsync(trajectory1);
+
         while (opModeIsActive() && !isStopRequested()) {
 
             switch (currentState) {
@@ -210,18 +210,24 @@ public class RedLeftV2 extends LinearOpMode {
                     chainBar.setPower(.5);
                     leftWinch.setTargetPosition(LIFT_HIGH);
                     rightWinch.setTargetPosition(LIFT_HIGH);
-                    if(runtime.seconds()>.5){
-                        leftWinch.setPower(.75);
-                        rightWinch.setPower(.75);
+                    if(runtime.seconds()>2){
+                        leftWinch.setPower(1);
+                        rightWinch.setPower(1);
                     }
-                    if(runtime.seconds()>3){
+                    if(runtime.seconds()>3.5){
+                        chainBar.setTargetPosition(ARM_5);
+                        leftWinch.setPower(.5);
+                        rightWinch.setPower(.5);
                         leftWinch.setTargetPosition(LIFT_BOTTOM);
                         rightWinch.setTargetPosition(LIFT_BOTTOM);
                     }
-                    if(!drive.isBusy()&&runtime.seconds()>3.5){
-                        currentState = State.TRAJECTORY_2;
+                    if(runtime.seconds()>4){
                         leftIntake.setPosition(LCLAW_MID);
                         rightIntake.setPosition(RCLAW_MID);
+
+                    }
+                    if(!drive.isBusy()&&runtime.seconds()>5){
+                        currentState = State.TRAJECTORY_2;
                         chainBar.setTargetPosition(ARM_MID);
                         drive.followTrajectoryAsync(trajectory2);
                     }
@@ -229,7 +235,8 @@ public class RedLeftV2 extends LinearOpMode {
                 case TRAJECTORY_2:
                     if(!drive.isBusy()){
                         drive.followTrajectoryAsync(trajectory3);
-                        currentState = State.IDLE;
+                        chainBar.setTargetPosition(ARM_5);
+                        currentState = State.TRAJECTORY_3;
                     }
                     break;
                 case TRAJECTORY_3:
