@@ -105,8 +105,8 @@ public class RedLeftV2 extends LinearOpMode {
         chainBar.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightWinch.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        rightWinch.setTargetPosition(LIFT_LOW);
-        leftWinch.setTargetPosition(LIFT_LOW);
+        rightWinch.setTargetPosition(LIFT_BOTTOM);
+        leftWinch.setTargetPosition(LIFT_BOTTOM);
         chainBar.setTargetPosition(ARM_0);
 
         rightWinch.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -132,12 +132,7 @@ public class RedLeftV2 extends LinearOpMode {
 
         telemetry.setMsTransmissionInterval(50);
 
-        /*
-         * The INIT-loop:
-         * This REPLACES waitForStart!
-         */
 
-        //CREATE TRAJECTORIES HERE
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
         Pose2d startPose = new Pose2d(0, 0, Math.toRadians(0));
@@ -166,13 +161,16 @@ public class RedLeftV2 extends LinearOpMode {
 
         Trajectory trajectory1 = drive.trajectoryBuilder(startPose)
                 .lineToConstantHeading(new Vector2d(40, 0))
-                .splineTo(new Vector2d(45.8,-6), 5.45)
+                .splineTo(new Vector2d(46.5,-8.5), 5.45)
                 .build();
         Trajectory trajectory2 = drive.trajectoryBuilder(trajectory1.end())
-                .lineToLinearHeading(new Pose2d(42, -2, Math.toRadians(90)))
+                .lineToLinearHeading(new Pose2d(43, -2, Math.toRadians(90)))
                 .build();
         Trajectory trajectory3 = drive.trajectoryBuilder(trajectory2.end())
-                .lineToLinearHeading(new Pose2d(53.7, 21.6, Math.toRadians(90)))
+                .lineToConstantHeading(new Vector2d(44, 19.6))
+                .build();
+        Trajectory trajectory4 = drive.trajectoryBuilder(trajectory3.end(), true)
+                .lineToConstantHeading(new Vector2d(44, 2))
                 .build();
 
         //TODO: split trajectory 1 into 2 trajectories, and replace the spline with a lineToLinearHeading
@@ -201,48 +199,78 @@ public class RedLeftV2 extends LinearOpMode {
 
         while (opModeIsActive() && !isStopRequested()) {
 
+            //debug stuff
+//            if(runtime.seconds()>2&&runtime.seconds()<2.2){
+//                leftWinch.setTargetPosition(LIFT_HIGH);
+//                rightWinch.setTargetPosition(LIFT_HIGH);
+//                leftWinch.setPower(1);
+//                rightWinch.setPower(1);
+//            }
+//            if(runtime.seconds()>6&&runtime.seconds()<6.2){
+//                leftWinch.setTargetPosition(LIFT_BOTTOM);
+//                rightWinch.setTargetPosition(LIFT_BOTTOM);
+//            }
+
+
             switch (currentState) {
                 case TRAJECTORY_1:
-                    leftIntake.setPosition(LCLAW_CLOSE);
-                    rightIntake.setPosition(RCLAW_CLOSE);
-
-                    chainBar.setTargetPosition(ARM_UP_FRONT);
-                    chainBar.setPower(.5);
-                    leftWinch.setTargetPosition(LIFT_HIGH);
-                    rightWinch.setTargetPosition(LIFT_HIGH);
-                    if(runtime.seconds()>2){
+                    if(runtime.seconds()>0&&runtime.seconds()<1) {
+                        leftIntake.setPosition(LCLAW_CLOSE);
+                        rightIntake.setPosition(RCLAW_CLOSE);
+                    }
+                    if(runtime.seconds()>1&&runtime.seconds()<1.2){
+                        chainBar.setTargetPosition(ARM_UP_FRONT);
+                        chainBar.setPower(.5);
+                        leftWinch.setTargetPosition(LIFT_HIGH);
+                        rightWinch.setTargetPosition(LIFT_HIGH);
                         leftWinch.setPower(1);
                         rightWinch.setPower(1);
                     }
-                    if(runtime.seconds()>3.5){
-                        chainBar.setTargetPosition(ARM_5);
-                        leftWinch.setPower(.5);
-                        rightWinch.setPower(.5);
+                    if(runtime.seconds()>3.2&&runtime.seconds()<3.4){
+                        chainBar.setTargetPosition(ARM_MID);
                         leftWinch.setTargetPosition(LIFT_BOTTOM);
                         rightWinch.setTargetPosition(LIFT_BOTTOM);
                     }
-                    if(runtime.seconds()>4){
+                    if(runtime.seconds()>3.4&&runtime.seconds()<3.6){
                         leftIntake.setPosition(LCLAW_MID);
                         rightIntake.setPosition(RCLAW_MID);
 
                     }
-                    if(!drive.isBusy()&&runtime.seconds()>5){
+                    if(!drive.isBusy()&&runtime.seconds()>4.5){
                         currentState = State.TRAJECTORY_2;
                         chainBar.setTargetPosition(ARM_MID);
                         drive.followTrajectoryAsync(trajectory2);
                     }
                     break;
-                case TRAJECTORY_2:
+                case TRAJECTORY_2: // turn around to aim at cones
                     if(!drive.isBusy()){
                         drive.followTrajectoryAsync(trajectory3);
                         chainBar.setTargetPosition(ARM_5);
                         currentState = State.TRAJECTORY_3;
+                        runtime.reset();
                     }
                     break;
-                case TRAJECTORY_3:
+                case TRAJECTORY_3: // go to cone stack
+                    if(runtime.seconds()>2&&runtime.seconds()<2.2){
+                        leftIntake.setPosition(LCLAW_CLOSE);
+                        rightIntake.setPosition(RCLAW_CLOSE);
+
+                    }
+                    if(runtime.seconds()>2.2&&runtime.seconds()<2.4){
+                        leftWinch.setTargetPosition(LIFT_LOW);
+                        rightWinch.setTargetPosition(LIFT_LOW);
+                        chainBar.setTargetPosition(ARM_MID);
+                    }
+                    if(!drive.isBusy()&&runtime.seconds()>2.7){
+                        drive.followTrajectoryAsync(trajectory4);
+                        currentState = State.IDLE;
+                    }
+                    break;
+                case TRAJECTORY_4:
                     if(!drive.isBusy()){
                         currentState = State.IDLE;
                     }
+                    break;
                 case IDLE:
                     break;
 
