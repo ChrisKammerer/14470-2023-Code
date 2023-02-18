@@ -78,6 +78,7 @@ public class RedLeftV2 extends LinearOpMode {
 
     enum State{
         TRAJECTORY_1, // move forward & spline
+        TRAJECTORY_1_5,
         TRAJECTORY_2, // back up and turn
         TRAJECTORY_3, // move to cones
         TRAJECTORY_4, // back up to pole
@@ -161,19 +162,21 @@ public class RedLeftV2 extends LinearOpMode {
 
         Trajectory trajectory1 = drive.trajectoryBuilder(startPose)
                 .lineToConstantHeading(new Vector2d(40, 0))
-                .splineTo(new Vector2d(46.5,-8.5), 5.45)
+//                .splineTo(new Vector2d(46.6,-8.1), 5.45)
+                .build();
+        Trajectory trajectory1_5 = drive.trajectoryBuilder(trajectory1.end())
+                .lineToLinearHeading(new Pose2d(46.2, -6.2, Math.toRadians(-27.5)))
                 .build();
         Trajectory trajectory2 = drive.trajectoryBuilder(trajectory1.end())
                 .lineToLinearHeading(new Pose2d(43, -2, Math.toRadians(90)))
                 .build();
         Trajectory trajectory3 = drive.trajectoryBuilder(trajectory2.end())
-                .lineToConstantHeading(new Vector2d(44, 19.6))
+                .lineToConstantHeading(new Vector2d(43.5, 19.6))
                 .build();
         Trajectory trajectory4 = drive.trajectoryBuilder(trajectory3.end(), true)
-                .lineToConstantHeading(new Vector2d(44, 2))
+                .lineToLinearHeading(new Pose2d(45, 2, Math.toRadians(135)))
                 .build();
 
-        //TODO: split trajectory 1 into 2 trajectories, and replace the spline with a lineToLinearHeading
         double parkX = 0;
         double parkY = 0;
 
@@ -218,6 +221,13 @@ public class RedLeftV2 extends LinearOpMode {
                         leftIntake.setPosition(LCLAW_CLOSE);
                         rightIntake.setPosition(RCLAW_CLOSE);
                     }
+                    if(!drive.isBusy()) {
+                        runtime.reset();
+                        currentState = State.TRAJECTORY_1_5;
+                        drive.followTrajectoryAsync(trajectory1_5);
+                    }
+                    break;
+                case TRAJECTORY_1_5:
                     if(runtime.seconds()>1&&runtime.seconds()<1.2){
                         chainBar.setTargetPosition(ARM_UP_FRONT);
                         chainBar.setPower(.5);
