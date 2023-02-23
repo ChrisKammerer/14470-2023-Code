@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.drive.opmode.autos;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 
@@ -21,7 +22,7 @@ import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import java.util.ArrayList;
-
+@Disabled
 @Autonomous
 public class LeftAutoRNGFix extends LinearOpMode {
     OpenCvCamera camera;

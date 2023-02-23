@@ -23,7 +23,7 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 import java.util.ArrayList;
 
 @Autonomous
-public class RedLeftV2 extends LinearOpMode {
+public class RedLeftV2HighBat extends LinearOpMode {
     OpenCvCamera camera;
     AprilTagDetectionPipeline aprilTagDetectionPipeline;
 
@@ -58,8 +58,8 @@ public class RedLeftV2 extends LinearOpMode {
 
     final int ARM_0 = 0;
     final int ARM_1 = 80;
-    final int ARM_2 = 244;
-    final int ARM_3 = 376;
+    final int ARM_2 = 224;
+    final int ARM_3 = 426;
     final int ARM_4 = 550;
     final int ARM_5 = 670;
     final int ARM_UP_FRONT = 875;
@@ -167,11 +167,11 @@ public class RedLeftV2 extends LinearOpMode {
         }
 
         Trajectory trajectory1 = drive.trajectoryBuilder(startPose)
-                .lineToConstantHeading(new Vector2d(47.7, 0))
+                .lineToConstantHeading(new Vector2d(47.1, 0))
 //                .splineTo(new Vector2d(46.6,-8.1), 5.45)
                 .build();
         Trajectory trajectory1_5 = drive.trajectoryBuilder(trajectory1.end())
-                .lineToLinearHeading(new Pose2d(48, -8.2, Math.toRadians(-25)))
+                .lineToLinearHeading(new Pose2d(47.4, -7.8, Math.toRadians(-25)))
                 .build();
         Trajectory trajectory1_5_2 = drive.trajectoryBuilder(trajectory1_5.end(), true)
                 .lineToConstantHeading(new Vector2d(45.1, -5.7))
@@ -182,13 +182,13 @@ public class RedLeftV2 extends LinearOpMode {
                     drive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                     .build();
         Trajectory trajectory3 = drive.trajectoryBuilder(trajectory2.end())
-                .lineToConstantHeading(new Vector2d(50.15, 17.3))
+                .lineToLinearHeading(new Pose2d(50.1, 16.9, Math.toRadians(90)))
                 .build();
-        Trajectory trajectory4 = drive.trajectoryBuilder(trajectory3.end(), true)
-                .lineToLinearHeading(new Pose2d(50, 0, Math.toRadians(145)))
-                .build();
-        Trajectory trajectory5 = drive.trajectoryBuilder((trajectory4.end()), true)
-                .lineToConstantHeading(new Vector2d(58.55, -8.5))
+//        Trajectory trajectory4 = drive.trajectoryBuilder(trajectory3.end(), true)
+//                .lineToLinearHeading(new Pose2d(50, 0, Math.toRadians(145)))
+//                .build();
+        Trajectory trajectory5 = drive.trajectoryBuilder((trajectory3.end()), true)
+                .splineTo(new Vector2d(59.3, -7), Math.toRadians(165+180))
                 .build();
 //        Trajectory trajectory4 = drive.trajectoryBuilder(trajectory3.end(), true)
 //                .lineToConstantHeading(new Vector2d(49, 6))
@@ -199,18 +199,18 @@ public class RedLeftV2 extends LinearOpMode {
 //                .splineTo(new Vector2d(50, 18), Math.toRadians(90))
 //                .build();
         Trajectory trajectory6 = drive.trajectoryBuilder(trajectory5.end())
-                .splineTo(new Vector2d(52, 17.9), Math.toRadians(90))
+                .splineTo(new Vector2d(52, 17.8), Math.toRadians(90))
 //                .lineToConstantHeading(new Vector2d(50, 18))
                 .build();
         Trajectory trajectory7 = drive.trajectoryBuilder(trajectory6.end(), true)
-                .splineTo(new Vector2d(59.3, -6.5), Math.toRadians(165+180))
+                .splineTo(new Vector2d(59.3, -6.85), Math.toRadians(165+180))
                 .build();
-        Trajectory trajectory8 = drive.trajectoryBuilder(trajectory7.end())
-                .splineTo(new Vector2d(50.5, 18.2), Math.toRadians(90))
-                .build();
-        Trajectory trajectory9 = drive.trajectoryBuilder(trajectory6.end(), true)
-                .splineTo(new Vector2d(59.3, -6.5), Math.toRadians(165+180))
-                .build();
+//        Trajectory trajectory8 = drive.trajectoryBuilder(trajectory7.end())
+//                .splineTo(new Vector2d(50.5, 18.2), Math.toRadians(90))
+//                .build();
+//        Trajectory trajectory9 = drive.trajectoryBuilder(trajectory6.end(), true)
+//                .splineTo(new Vector2d(59.3, -6.6), Math.toRadians(165+180))
+//                .build();
 
         double parkX = 0;
         double parkY = 0;
@@ -318,22 +318,16 @@ public class RedLeftV2 extends LinearOpMode {
                         chainBar.setTargetPosition(ARM_MID);
                     }
                     if(!drive.isBusy()&&runtime.seconds()>2.7){
-                        drive.followTrajectoryAsync(trajectory4);
-                        runtime.reset();
-                        currentState = State.TRAJECTORY_4;
-                    }
-                    break;
-                case TRAJECTORY_4:
-                    if(runtime.seconds()>1&&runtime.seconds()<1.2){
-                        leftWinch.setTargetPosition(LIFT_HIGH);
-                        rightWinch.setTargetPosition(LIFT_HIGH);
-                    }
-                    if(!drive.isBusy()){
                         drive.followTrajectoryAsync(trajectory5);
+                        runtime.reset();
                         currentState = State.TRAJECTORY_5;
                     }
                     break;
                 case TRAJECTORY_5:
+                    if(runtime.seconds()>1&&runtime.seconds()<1.2){
+                        leftWinch.setTargetPosition(LIFT_HIGH);
+                        rightWinch.setTargetPosition(LIFT_HIGH);
+                    }
                     if(runtime.seconds()>2.2&&runtime.seconds()<2.4){
                         chainBar.setTargetPosition(ARM_BACK_POLE);
                     }
@@ -342,7 +336,7 @@ public class RedLeftV2 extends LinearOpMode {
                         rightIntake.setPosition(RCLAW_MID);
                         chainBar.setTargetPosition(ARM_4);
                     }
-                    if(!drive.isBusy()&&runtime.seconds()>3.1){
+                    if(!drive.isBusy()&&runtime.seconds()>3.5){
                         drive.followTrajectoryAsync(trajectory6);
                         leftWinch.setTargetPosition(LIFT_BOTTOM);
                         rightWinch.setTargetPosition(LIFT_BOTTOM);
@@ -380,49 +374,48 @@ public class RedLeftV2 extends LinearOpMode {
                     }
                     if(runtime.seconds()>2.9&&runtime.seconds()<3.1){
                         chainBar.setTargetPosition(ARM_3);
-
                     }
-                    if(!drive.isBusy()&&runtime.seconds()>3.2){
+                    if(!drive.isBusy()&&runtime.seconds()>3.4){
                         leftWinch.setTargetPosition(LIFT_BOTTOM);
                         rightWinch.setTargetPosition(LIFT_BOTTOM);
-                        drive.followTrajectoryAsync(trajectory8);
+//                        drive.followTrajectoryAsync(trajectory8);
                         runtime.reset();
-                        currentState = State.TRAJECTORY_8;
-                    }
-                    break;
-                case TRAJECTORY_8:
-                    if(runtime.seconds()>1.5&&runtime.seconds()>1.7){
-                        leftIntake.setPosition(LCLAW_CLOSE);
-                        rightIntake.setPosition(RCLAW_CLOSE);
-                    }
-                    if(runtime.seconds()>1.6&&runtime.seconds()>1.8){
-                        chainBar.setTargetPosition(ARM_MID);
-                        leftWinch.setTargetPosition(LIFT_LOW);
-                        rightWinch.setTargetPosition(LIFT_LOW);
-                    }
-                    if(!drive.isBusy()&& runtime.seconds()>2){
-                        drive.followTrajectoryAsync(trajectory9);
-                        runtime.reset();
-                        currentState = State.TRAJECTORY_9;
-                    }
-                    break;
-                case TRAJECTORY_9:
-                    if(runtime.seconds()>1&&runtime.seconds()<1.2){
-                        leftWinch.setTargetPosition(LIFT_HIGH);
-                        rightWinch.setTargetPosition(LIFT_HIGH);
-                    }
-                    if(runtime.seconds()>2.4&&runtime.seconds()>2.6){
-                        chainBar.setTargetPosition(ARM_BACK_POLE);
-                    }
-                    if(runtime.seconds()>2.6&&runtime.seconds()<2.8){
-                        leftIntake.setPosition(LCLAW_MID);
-                        rightIntake.setPosition(RCLAW_MID);
-                        chainBar.setTargetPosition(ARM_2);
-                    }
-                    if(!drive.isBusy()&&runtime.seconds()>2.8){
                         currentState = State.IDLE;
                     }
                     break;
+//                case TRAJECTORY_8:
+//                    if(runtime.seconds()>1.5&&runtime.seconds()>1.7){
+//                        leftIntake.setPosition(LCLAW_CLOSE);
+//                        rightIntake.setPosition(RCLAW_CLOSE);
+//                    }
+//                    if(runtime.seconds()>1.6&&runtime.seconds()>1.8){
+//                        chainBar.setTargetPosition(ARM_MID);
+//                        leftWinch.setTargetPosition(LIFT_LOW);
+//                        rightWinch.setTargetPosition(LIFT_LOW);
+//                    }
+//                    if(!drive.isBusy()&& runtime.seconds()>2){
+//                        drive.followTrajectoryAsync(trajectory9);
+//                        runtime.reset();
+//                        currentState = State.TRAJECTORY_9;
+//                    }
+//                    break;
+//                case TRAJECTORY_9:
+//                    if(runtime.seconds()>1&&runtime.seconds()<1.2){
+//                        leftWinch.setTargetPosition(LIFT_HIGH);
+//                        rightWinch.setTargetPosition(LIFT_HIGH);
+//                    }
+//                    if(runtime.seconds()>2&&runtime.seconds()>2.2){
+//                        chainBar.setTargetPosition(ARM_BACK_POLE);
+//                    }
+//                    if(runtime.seconds()>2.8&&runtime.seconds()>3){
+//                        leftIntake.setPosition(LCLAW_MID);
+//                        rightIntake.setPosition(RCLAW_MID);
+//                        chainBar.setTargetPosition(ARM_2);
+//                    }
+//                    if(!drive.isBusy()&&runtime.seconds()>3){
+//                        currentState = State.IDLE;
+//                    }
+//                    break;
                 case IDLE:
                     break;
 
